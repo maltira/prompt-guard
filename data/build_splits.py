@@ -2,6 +2,7 @@
 
 порядок: загрузка - фильтры - дедупликация - исключение близких к golden - разбиение
 """
+import argparse
 import glob
 import hashlib
 import json
@@ -15,7 +16,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 
 from data.build_golden import build as build_golden
-from data.schema import Record, write_jsonl
+from data.golden_hash import GoldenChangedError, register, sha256_bytes
+from data.schema import Record, dumps_jsonl, write_jsonl
 from data.synth import generate
 
 RAW = Path("data/raw")
@@ -136,8 +138,14 @@ def dedup(records: list[Record], golden: list[Record]) -> tuple[list[Record], di
     return keep, dict(stats)
 
 
-def main() -> None:
+def main(update_golden_hash: bool = False) -> None:
     golden = build_golden()
+    # хэш проверяется до записи любых файлов: при расхождении golden.jsonl не трогаем
+    golden_hash = sha256_bytes(dumps_jsonl(golden).encode("utf-8"))
+    try:
+        hash_status = register(golden_hash, update=update_golden_hash)
+    except GoldenChangedError as e:
+        raise SystemExit(f"остановлено: {e}")
     pool = load_public() + generate({"en": (900, 600, 400, 30), "ru": (900, 1100, 550, 30)})
     print("до фильтров:", len(pool))
     pool, dstats = dedup(pool, golden)
@@ -158,13 +166,15 @@ def main() -> None:
                        "category": dict(Counter(r.category for r in recs).most_common()),
                        "source": dict(Counter(r.source for r in recs))}
     stats["dedup"] = dstats
-    stats["golden_sha256"] = hashlib.sha256((SPLITS / "golden.jsonl").read_bytes()).hexdigest()
     (SPLITS / "stats.json").write_text(json.dumps(stats, ensure_ascii=False, indent=2), encoding="utf-8")
     for name in ("train", "val", "golden"):
         s = stats[name]
         print(f"{name}: {s['total']} | {s['label']} | {s['lang']}")
-    print("golden sha256:", stats["golden_sha256"])
+    print(f"golden sha256 ({hash_status}):", golden_hash)
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--update-golden-hash", action="store_true",
+                        help="записать новый хэш golden, если он намеренно изменился")
+    main(parser.parse_args().update_golden_hash)

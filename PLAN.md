@@ -33,12 +33,14 @@ data/             подробности в data/README.md
   splits/         train.jsonl, val.jsonl, golden.jsonl, stats.json
 detectors/
   base.py         общий интерфейс Detector.predict(text) -> (label, score)
-  embeddings.py   подход 1
-  lora.py         подход 2 (инференс адаптера)
-  prompt_tuning.py подход 3 (инференс)
-  judge.py        подход 4 (Haiku 5.5)
   llm_cache.py    клиент LLM с дисковым кэшем ответов
-  cascade.py      подход 5
+  implementations/   конкретные детекторы
+    keyword.py      бейзлайн по ключевым словам
+    embeddings.py   подход 1
+    lora.py         подход 2 (инференс адаптера)
+    prompt_tuning.py подход 3 (инференс)
+    judge.py        подход 4 (Haiku 5.5)
+    cascade.py      подход 5
 notebooks/
   train_lora.ipynb
   train_prompt_tuning.ipynb
@@ -48,7 +50,7 @@ attacks/          генератор адаптивных атак
 eval/
   run_eval.py     прогон детекторов по golden set
   plots.py        графики для статьи
-results/          JSON/CSV с результатами, кэш ответов LLM
+results/<детектор>/  метрики и предсказания по выборкам; results/cache/ - кэш ответов LLM
 viewer/           страница демо и панель
 docker-compose.yml
 ```
@@ -74,17 +76,17 @@ docker-compose.yml
    - **пограничные** безопасные тексты, похожие на атаку.
 3. Удалить дубликаты и почти-дубликаты (по косинусной близости tf-idf), чтобы похожие тексты не попали одновременно в train и golden.
 4. Разбить: train / val / golden. Golden: 450 примеров, поровну классов, написан и просмотрен вручную.
-5. Зафиксировать golden (хэш файла в `data/README.md`) и больше не менять.
+5. Зафиксировать golden (хэш файла в `data/splits/golden.sha256`) и больше не менять.
 
 **Готово, когда:** три файла в `data/splits/`, статистика по классам, языкам и категориям. Результат и ограничения датасета: [data/README.md](data/README.md).
 
-### Этап 2. Оценочный стенд (день 3)
+### Этап 2. Оценочный стенд (день 3) - выполнен
 
 - `eval/run_eval.py`: прогоняет любой `Detector` по golden, сохраняет предсказания, считает recall, precision, F1, долю ложных срабатываний, задержку (p50/p95), стоимость на 1000 запросов.
 - Отдельные метрики по категориям и по пограничным примерам.
 - Тривиальный бейзлайн (ключевые слова вроде «ignore previous instructions») для нижней планки.
 
-**Готово, когда:** бейзлайн оценён, таблица сохраняется в `results/`.
+**Готово, когда:** бейзлайн оценён, таблица сохраняется в `results/<детектор>/`.
 
 ### Этап 3. Подходы 1 и 4 (дни 3–4)
 
@@ -99,7 +101,7 @@ docker-compose.yml
 - Базовая модель: небольшая многоязычная энкодерная модель (например, xlm-roberta-base или mdeberta-v3-base), задача: классификация последовательности.
 - Ноутбуки для Colab: библиотеки `transformers` + `peft`, обучение на train, ранняя остановка по val.
 - Prompt tuning на той же базовой модели, чтобы сравнение было честным.
-- Скачать адаптеры, подключить в `detectors/lora.py` и `prompt_tuning.py`, проверить инференс на CPU.
+- Скачать адаптеры, подключить в `detectors/implementations/lora.py` и `prompt_tuning.py`, проверить инференс на CPU.
 
 **Готово, когда:** все 4 одиночных подхода в общей таблице.
 

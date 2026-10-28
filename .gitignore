@@ -9,6 +9,7 @@ __pycache__/
 
 # результаты и кэш LLM
 results/cache/
+results/*/*_predictions.jsonl
 
 # данные: исходные наборы не коммитим, .gitkeep оставляем
 data/raw/*

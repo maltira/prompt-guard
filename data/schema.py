@@ -41,7 +41,10 @@ def read_jsonl(path: str | Path) -> list[Record]:
     return records
 
 
+def dumps_jsonl(records: list[Record]) -> str:
+    return "".join(json.dumps(asdict(r), ensure_ascii=False) + "\n" for r in records)
+
+
 def write_jsonl(path: str | Path, records: list[Record]) -> None:
-    with open(path, "w", encoding="utf-8") as f:
-        for r in records:
-            f.write(json.dumps(asdict(r), ensure_ascii=False) + "\n")
+    with open(path, "w", encoding="utf-8", newline="\n") as f:
+        f.write(dumps_jsonl(records))

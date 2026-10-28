@@ -139,6 +139,5 @@
   },
   "dedup": {
     "near_dup": 107
-  },
-  "golden_sha256": "c2f72db3e913229e28e4750587e53febeb49ea45e2a13b739c85e35a39c29fec"
+  }
 }
