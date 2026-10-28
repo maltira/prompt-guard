@@ -11,14 +11,22 @@ import argparse
 import json
 import time
 from collections import defaultdict
+from functools import partial
 from pathlib import Path
 
 from data.golden_hash import GoldenChangedError, verify_file
 from data.schema import read_jsonl
+from detectors.implementations.embeddings import KINDS, EmbeddingDetector, detector_name
 from detectors.implementations.keyword import KeywordDetector
 from eval.metrics import bootstrap_ci, scores
 
+# модель -> брать ли эмбеддинги из кэша (large считается в Colab, а не на ноутбуке)
+EMBEDDING_MODELS = {"intfloat/multilingual-e5-small": False, "intfloat/multilingual-e5-base": False,
+                    "intfloat/multilingual-e5-large": True}
 DETECTORS = {"keyword": KeywordDetector}
+for _model, _precomputed in EMBEDDING_MODELS.items():
+    for _kind in KINDS:
+        DETECTORS[detector_name(_model, _kind)] = partial(EmbeddingDetector, _model, _kind, _precomputed)
 MIN_SLICE = 10  # категории меньше этого размера объединяются в одну строку
 SPLITS_DIR = Path("data/splits")
 RESULTS_DIR = Path("results")
@@ -118,6 +126,7 @@ def run(detector_name: str, split: str) -> dict:
         "split": split,
         "n": len(recs),
         "latency_ms": {"p50": percentile(latencies, 0.50), "p95": percentile(latencies, 0.95)},
+        "latency_note": getattr(detector, "latency_note", None),
         "cost_per_1000_usd": getattr(detector, "cost_per_1000", None),
         "slices": rows,
     }

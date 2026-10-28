@@ -1,0 +1,334 @@
+{
+  "detector": "embeddings-e5-base-knn",
+  "split": "val",
+  "n": 1621,
+  "latency_ms": {
+    "p50": 148.6810450005578,
+    "p95": 197.179402999609
+  },
+  "cost_per_1000_usd": 0.0,
+  "slices": [
+    {
+      "slice": "все",
+      "n": 1621,
+      "attacks": 728,
+      "benign": 893,
+      "recall": 0.885989010989011,
+      "precision": 0.8799454297407913,
+      "f1": 0.8829568788501027,
+      "fpr": 0.09854423292273236,
+      "recall_ci": [
+        0.8627717391304348,
+        0.9086021505376344
+      ],
+      "fpr_ci": [
+        0.08062709966405375,
+        0.11661166116611661
+      ]
+    },
+    {
+      "slice": "lang=en",
+      "n": 939,
+      "attacks": 430,
+      "benign": 509,
+      "recall": 0.913953488372093,
+      "precision": 0.8694690265486725,
+      "f1": 0.8911564625850341,
+      "fpr": 0.11591355599214145,
+      "recall_ci": [
+        0.8844444444444445,
+        0.9405034324942791
+      ],
+      "fpr_ci": [
+        0.08840864440078586,
+        0.14344262295081966
+      ]
+    },
+    {
+      "slice": "lang=ru",
+      "n": 682,
+      "attacks": 298,
+      "benign": 384,
+      "recall": 0.8456375838926175,
+      "precision": 0.896797153024911,
+      "f1": 0.8704663212435233,
+      "fpr": 0.07552083333333333,
+      "recall_ci": [
+        0.8056537102473498,
+        0.8833333333333333
+      ],
+      "fpr_ci": [
+        0.05194805194805195,
+        0.10256410256410256
+      ]
+    },
+    {
+      "slice": "category=benign",
+      "n": 755,
+      "attacks": 0,
+      "benign": 755,
+      "recall": null,
+      "precision": null,
+      "f1": null,
+      "fpr": 0.10463576158940398,
+      "fpr_ci": [
+        0.08344370860927153,
+        0.1271523178807947
+      ]
+    },
+    {
+      "slice": "category=benign_borderline",
+      "n": 138,
+      "attacks": 0,
+      "benign": 138,
+      "recall": null,
+      "precision": null,
+      "f1": null,
+      "fpr": 0.06521739130434782,
+      "fpr_ci": [
+        0.028985507246376812,
+        0.10869565217391304
+      ]
+    },
+    {
+      "slice": "category=direct_injection",
+      "n": 440,
+      "attacks": 440,
+      "benign": 0,
+      "recall": 0.9772727272727273,
+      "precision": null,
+      "f1": null,
+      "fpr": null,
+      "recall_ci": [
+        0.9613636363636363,
+        0.990909090909091
+      ]
+    },
+    {
+      "slice": "category=fake_system_message",
+      "n": 44,
+      "attacks": 44,
+      "benign": 0,
+      "recall": 0.7727272727272727,
+      "precision": null,
+      "f1": null,
+      "fpr": null,
+      "recall_ci": [
+        0.6590909090909091,
+        0.8863636363636364
+      ]
+    },
+    {
+      "slice": "category=hidden_instruction",
+      "n": 42,
+      "attacks": 42,
+      "benign": 0,
+      "recall": 0.6666666666666666,
+      "precision": null,
+      "f1": null,
+      "fpr": null,
+      "recall_ci": [
+        0.5238095238095238,
+        0.8095238095238095
+      ]
+    },
+    {
+      "slice": "category=instruction_override",
+      "n": 42,
+      "attacks": 42,
+      "benign": 0,
+      "recall": 0.8809523809523809,
+      "precision": null,
+      "f1": null,
+      "fpr": null,
+      "recall_ci": [
+        0.7857142857142857,
+        0.9761904761904762
+      ]
+    },
+    {
+      "slice": "category=jailbreak",
+      "n": 18,
+      "attacks": 18,
+      "benign": 0,
+      "recall": 0.9444444444444444,
+      "precision": null,
+      "f1": null,
+      "fpr": null,
+      "recall_ci": [
+        0.8333333333333334,
+        1.0
+      ]
+    },
+    {
+      "slice": "category=output_manipulation",
+      "n": 40,
+      "attacks": 40,
+      "benign": 0,
+      "recall": 0.525,
+      "precision": null,
+      "f1": null,
+      "fpr": null,
+      "recall_ci": [
+        0.375,
+        0.675
+      ]
+    },
+    {
+      "slice": "category=role_hijack",
+      "n": 45,
+      "attacks": 45,
+      "benign": 0,
+      "recall": 0.7777777777777778,
+      "precision": null,
+      "f1": null,
+      "fpr": null,
+      "recall_ci": [
+        0.6444444444444445,
+        0.8888888888888888
+      ]
+    },
+    {
+      "slice": "category=secret_exfiltration",
+      "n": 40,
+      "attacks": 40,
+      "benign": 0,
+      "recall": 0.65,
+      "precision": null,
+      "f1": null,
+      "fpr": null,
+      "recall_ci": [
+        0.5,
+        0.8
+      ]
+    },
+    {
+      "slice": "category=прочие (меньше 10 примеров)",
+      "n": 17,
+      "attacks": 17,
+      "benign": 0,
+      "recall": 1.0,
+      "precision": null,
+      "f1": null,
+      "fpr": null,
+      "recall_ci": [
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "slice": "source=hf:IlyaGusev/ru_turbo_alpaca",
+      "n": 135,
+      "attacks": 0,
+      "benign": 135,
+      "recall": null,
+      "precision": null,
+      "f1": null,
+      "fpr": 0.14074074074074075,
+      "fpr_ci": [
+        0.08148148148148149,
+        0.2
+      ]
+    },
+    {
+      "slice": "source=hf:S-Labs/prompt-injection-dataset",
+      "n": 330,
+      "attacks": 147,
+      "benign": 183,
+      "recall": 0.9659863945578231,
+      "precision": 0.8502994011976048,
+      "f1": 0.9044585987261147,
+      "fpr": 0.1366120218579235,
+      "recall_ci": [
+        0.935251798561151,
+        0.9930555555555556
+      ],
+      "fpr_ci": [
+        0.08522727272727272,
+        0.19289340101522842
+      ]
+    },
+    {
+      "slice": "source=hf:deepset/prompt-injections",
+      "n": 44,
+      "attacks": 23,
+      "benign": 21,
+      "recall": 0.8695652173913043,
+      "precision": 0.8695652173913043,
+      "f1": 0.8695652173913043,
+      "fpr": 0.14285714285714285,
+      "recall_ci": [
+        0.7142857142857143,
+        1.0
+      ],
+      "fpr_ci": [
+        0.0,
+        0.3157894736842105
+      ]
+    },
+    {
+      "slice": "source=hf:dmtrdr/russian_prompt_injections",
+      "n": 172,
+      "attacks": 172,
+      "benign": 0,
+      "recall": 0.9883720930232558,
+      "precision": null,
+      "f1": null,
+      "fpr": null,
+      "recall_ci": [
+        0.9709302325581395,
+        1.0
+      ]
+    },
+    {
+      "slice": "source=hf:neuralchemy/Prompt-injection-dataset",
+      "n": 287,
+      "attacks": 134,
+      "benign": 153,
+      "recall": 0.9925373134328358,
+      "precision": 0.9366197183098591,
+      "f1": 0.9637681159420289,
+      "fpr": 0.058823529411764705,
+      "recall_ci": [
+        0.9733333333333334,
+        1.0
+      ],
+      "fpr_ci": [
+        0.024096385542168676,
+        0.0958904109589041
+      ]
+    },
+    {
+      "slice": "source=synthetic:template",
+      "n": 649,
+      "attacks": 252,
+      "benign": 397,
+      "recall": 0.7142857142857143,
+      "precision": 0.8490566037735849,
+      "f1": 0.7758620689655172,
+      "fpr": 0.08060453400503778,
+      "recall_ci": [
+        0.6639676113360324,
+        0.7669172932330827
+      ],
+      "fpr_ci": [
+        0.05263157894736842,
+        0.10997442455242967
+      ]
+    },
+    {
+      "slice": "source=synthetic:template_short",
+      "n": 4,
+      "attacks": 0,
+      "benign": 4,
+      "recall": null,
+      "precision": null,
+      "f1": null,
+      "fpr": 0.0,
+      "fpr_ci": [
+        0.0,
+        0.0
+      ]
+    }
+  ]
+}
