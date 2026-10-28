@@ -1,0 +1,144 @@
+{
+  "train": {
+    "total": 9180,
+    "label": {
+      "attack": 4121,
+      "benign": 5059
+    },
+    "lang": {
+      "ru": 3865,
+      "en": 5315
+    },
+    "label_lang": {
+      "attack/ru": 1689,
+      "benign/en": 2883,
+      "attack/en": 2432,
+      "benign/ru": 2176
+    },
+    "category": {
+      "benign": 4214,
+      "direct_injection": 2466,
+      "benign_borderline": 845,
+      "instruction_override": 255,
+      "hidden_instruction": 250,
+      "role_hijack": 244,
+      "fake_system_message": 232,
+      "output_manipulation": 231,
+      "secret_exfiltration": 224,
+      "jailbreak": 97,
+      "adversarial": 14,
+      "training_extraction": 12,
+      "encoding": 12,
+      "rag_poisoning": 9,
+      "token_smuggling": 8,
+      "agent_manipulation": 7,
+      "response_manipulation": 6,
+      "persona_replacement": 6,
+      "prompt_extraction": 6,
+      "model_fingerprinting": 6,
+      "system_manipulation": 5,
+      "multi_turn": 5,
+      "context_confusion": 5,
+      "control": 5,
+      "system_extraction": 4,
+      "prompt_injection": 3,
+      "payload_injection": 3,
+      "many_shot": 2,
+      "code_execution": 1,
+      "crescendo": 1,
+      "encoding_obfuscation": 1,
+      "indirect_injection": 1
+    },
+    "source": {
+      "hf:dmtrdr/russian_prompt_injections": 974,
+      "synthetic:template": 3667,
+      "hf:deepset/prompt-injections": 281,
+      "hf:S-Labs/prompt-injection-dataset": 1820,
+      "hf:IlyaGusev/ru_turbo_alpaca": 765,
+      "hf:neuralchemy/Prompt-injection-dataset": 1637,
+      "synthetic:template_short": 36
+    }
+  },
+  "val": {
+    "total": 1621,
+    "label": {
+      "attack": 728,
+      "benign": 893
+    },
+    "lang": {
+      "ru": 682,
+      "en": 939
+    },
+    "label_lang": {
+      "attack/ru": 298,
+      "benign/en": 509,
+      "attack/en": 430,
+      "benign/ru": 384
+    },
+    "category": {
+      "benign": 755,
+      "direct_injection": 440,
+      "benign_borderline": 138,
+      "role_hijack": 45,
+      "fake_system_message": 44,
+      "hidden_instruction": 42,
+      "instruction_override": 42,
+      "secret_exfiltration": 40,
+      "output_manipulation": 40,
+      "jailbreak": 18,
+      "adversarial": 4,
+      "encoding": 4,
+      "persona_replacement": 3,
+      "context_confusion": 2,
+      "agent_manipulation": 1,
+      "token_smuggling": 1,
+      "model_fingerprinting": 1,
+      "prompt_extraction": 1
+    },
+    "source": {
+      "synthetic:template": 649,
+      "hf:dmtrdr/russian_prompt_injections": 172,
+      "hf:neuralchemy/Prompt-injection-dataset": 287,
+      "hf:S-Labs/prompt-injection-dataset": 330,
+      "hf:IlyaGusev/ru_turbo_alpaca": 135,
+      "hf:deepset/prompt-injections": 44,
+      "synthetic:template_short": 4
+    }
+  },
+  "golden": {
+    "total": 450,
+    "label": {
+      "attack": 225,
+      "benign": 225
+    },
+    "lang": {
+      "en": 200,
+      "ru": 250
+    },
+    "label_lang": {
+      "attack/en": 100,
+      "attack/ru": 125,
+      "benign/en": 100,
+      "benign/ru": 125
+    },
+    "category": {
+      "benign": 133,
+      "benign_borderline": 92,
+      "hidden_instruction": 40,
+      "instruction_override": 37,
+      "secret_exfiltration": 37,
+      "fake_system_message": 37,
+      "role_hijack": 37,
+      "output_manipulation": 37
+    },
+    "source": {
+      "custom:handwritten": 200,
+      "custom:ru_adapted": 175,
+      "custom:ru_native": 75
+    }
+  },
+  "dedup": {
+    "near_dup": 107
+  },
+  "golden_sha256": "c2f72db3e913229e28e4750587e53febeb49ea45e2a13b739c85e35a39c29fec"
+}

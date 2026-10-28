@@ -1,0 +1,20 @@
+[project]
+name = "prompt-guard"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "openai>=3.40.0",
+    "pandas>=3.1.0",
+    "pyarrow>=26.0.0",
+    "python-dotenv>=1.2.4",
+    "scikit-learn>=1.9.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

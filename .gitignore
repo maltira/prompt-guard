@@ -1,0 +1,19 @@
+# секреты и локальные настройки
+.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# результаты и кэш LLM
+results/cache/
+
+# данные: исходные наборы не коммитим, .gitkeep оставляем
+data/raw/*
+!data/raw/.gitkeep
+
+# веса моделей
+*.safetensors
+*.bin
