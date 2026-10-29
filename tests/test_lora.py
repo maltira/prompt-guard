@@ -39,3 +39,9 @@ def test_load_precomputed_rejects_changed_split(tmp_path):
     (adapter / "probs_val.json").write_text(json.dumps({"split": "val", "split_sha256": "0" * 64, "n": 1, "probs": [0.1]}))
     with pytest.raises(SystemExit):
         load_precomputed(adapter, splits)
+
+
+def test_prompt_tuning_detector_points_to_its_own_notebook(tmp_path):
+    from detectors.implementations.prompt_tuning import PromptTuningDetector
+    with pytest.raises(SystemExit, match="train_prompt_tuning"):
+        PromptTuningDetector(adapter_dir=tmp_path)

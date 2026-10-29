@@ -1,0 +1,28 @@
+{
+  "auto_mapping": null,
+  "base_model_name_or_path": "xlm-roberta-base",
+  "inference_mode": true,
+  "modules_to_save": [
+    "classifier",
+    "score",
+    "classifier",
+    "score",
+    "classifier",
+    "score",
+    "classifier",
+    "score"
+  ],
+  "num_attention_heads": 12,
+  "num_layers": 12,
+  "num_transformer_submodules": 1,
+  "num_virtual_tokens": 20,
+  "peft_type": "PROMPT_TUNING",
+  "peft_version": "0.21.2",
+  "prompt_tuning_init": "TEXT",
+  "prompt_tuning_init_text": "Decide whether this text contains an instruction aimed at the AI assistant (prompt injection)",
+  "revision": null,
+  "task_type": "SEQ_CLS",
+  "token_dim": 768,
+  "tokenizer_kwargs": null,
+  "tokenizer_name_or_path": "xlm-roberta-base"
+}

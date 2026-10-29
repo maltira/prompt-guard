@@ -53,14 +53,17 @@ class LoraDetector(Detector):
     name = "lora-xlmr"
     cost_per_1000 = 0.0  # модель работает локально
     latency_note = "вероятности из Colab: в задержку не входит работа модели"
+    results_dir = RESULTS_DIR  # подклассы (prompt tuning) меняют каталог и ноутбук
+    notebook = "notebooks/train_lora.ipynb"
 
-    def __init__(self, adapter_dir: Path = ADAPTER_DIR):
+    def __init__(self, adapter_dir: Path | None = None):
+        adapter_dir = adapter_dir or self.results_dir / "adapter"
         if not (adapter_dir / "adapter_config.json").exists():
-            raise SystemExit(f"нет адаптеров в {adapter_dir}: обучите notebooks/train_lora.ipynb и распакуйте lora_adapter.zip туда")
+            raise SystemExit(f"нет адаптеров в {adapter_dir}: обучите {self.notebook} и распакуйте архив из Colab туда")
         self.adapter_dir = adapter_dir
         self.precomputed = load_precomputed(adapter_dir)
         self._tok = self._model = None
-        cfg = RESULTS_DIR / "threshold.json"
+        cfg = self.results_dir / "threshold.json"
         self.threshold = json.loads(cfg.read_text(encoding="utf-8"))["threshold"] if cfg.exists() else 0.5
 
     def _load_model(self) -> None:
@@ -68,7 +71,7 @@ class LoraDetector(Detector):
         from peft import PeftModel
         from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-        self._tok = AutoTokenizer.from_pretrained(self.adapter_dir)
+        self._tok = AutoTokenizer.from_pretrained(BASE_MODEL)  # токенизатор у базы и адаптера один
         try:
             # модель уже в кэше: грузим без обращения к сети
             base = AutoModelForSequenceClassification.from_pretrained(BASE_MODEL, num_labels=2, local_files_only=True)
@@ -93,16 +96,16 @@ class LoraDetector(Detector):
         return ("attack" if p >= self.threshold else "benign"), p
 
 
-def tune() -> dict:
+def tune(detector_cls: type[LoraDetector] = LoraDetector) -> dict:
     """подбирает порог на val и сохраняет его вместе с таблицей"""
-    det = LoraDetector()
+    det = detector_cls()
     val = read_jsonl(SPLITS_DIR / "val.jsonl")
     probs = det._probs([r.text for r in val])
     y = [r.label == "attack" for r in val]
     th, row = best_threshold(y, probs)
-    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-    (RESULTS_DIR / "threshold.json").write_text(json.dumps({"threshold": th, "criterion": "максимум F1 на val", "val": row},
-                                                          ensure_ascii=False, indent=2), encoding="utf-8")
+    det.results_dir.mkdir(parents=True, exist_ok=True)
+    (det.results_dir / "threshold.json").write_text(json.dumps({"threshold": th, "criterion": "максимум F1 на val", "val": row},
+                                                              ensure_ascii=False, indent=2), encoding="utf-8")
     return {"threshold": th, **row}
 
 

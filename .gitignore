@@ -9,11 +9,21 @@ __pycache__/
 
 # результаты и кэш LLM
 results/cache/
-results/*/*_predictions.jsonl
+results/**/*_predictions.jsonl
 results/*/classifier.joblib
 
 # данные: исходные наборы не коммитим
 data/raw/*
+
+# архив из Colab и файлы токенизатора адаптера (токенизатор скачивается вместе с базой)
+results/lora-xlmr/lora_adapter.zip
+results/lora-xlmr/adapter/README.md
+results/lora-xlmr/adapter/tokenizer.json
+results/lora-xlmr/adapter/tokenizer_config.json
+results/prompt-tuning-xlmr/**/prompt_adapter.zip
+results/prompt-tuning-xlmr/**/README.md
+results/prompt-tuning-xlmr/**/tokenizer.json
+results/prompt-tuning-xlmr/**/tokenizer_config.json
 
 # веса моделей
 *.safetensors
