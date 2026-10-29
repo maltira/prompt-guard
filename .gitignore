@@ -12,9 +12,8 @@ results/cache/
 results/*/*_predictions.jsonl
 results/*/classifier.joblib
 
-# данные: исходные наборы не коммитим, .gitkeep оставляем
+# данные: исходные наборы не коммитим
 data/raw/*
-!data/raw/.gitkeep
 
 # веса моделей
 *.safetensors

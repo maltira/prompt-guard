@@ -1,108 +1,130 @@
 {
   "train": {
-    "total": 9180,
+    "total": 6055,
     "label": {
-      "attack": 4121,
-      "benign": 5059
+      "attack": 3062,
+      "benign": 2993
     },
     "lang": {
-      "ru": 3865,
-      "en": 5315
+      "en": 3431,
+      "ru": 2624
     },
     "label_lang": {
-      "attack/ru": 1689,
-      "benign/en": 2883,
-      "attack/en": 2432,
-      "benign/ru": 2176
+      "attack/en": 1806,
+      "attack/ru": 1256,
+      "benign/en": 1625,
+      "benign/ru": 1368
     },
     "category": {
-      "benign": 4214,
-      "direct_injection": 2466,
-      "benign_borderline": 845,
-      "instruction_override": 255,
-      "hidden_instruction": 250,
-      "role_hijack": 244,
-      "fake_system_message": 232,
-      "output_manipulation": 231,
-      "secret_exfiltration": 224,
-      "jailbreak": 97,
-      "adversarial": 14,
+      "direct_injection": 2435,
+      "benign": 1966,
+      "benign_borderline": 1027,
+      "instruction_override": 117,
+      "hidden_instruction": 84,
+      "secret_exfiltration": 79,
+      "role_hijack": 79,
+      "output_manipulation": 74,
+      "fake_system_message": 74,
+      "rag_poisoning": 22,
+      "prompt_injection": 21,
+      "context_confusion": 15,
+      "system_extraction": 14,
       "training_extraction": 12,
-      "encoding": 12,
-      "rag_poisoning": 9,
-      "token_smuggling": 8,
-      "agent_manipulation": 7,
-      "response_manipulation": 6,
-      "persona_replacement": 6,
-      "prompt_extraction": 6,
-      "model_fingerprinting": 6,
-      "system_manipulation": 5,
-      "multi_turn": 5,
-      "context_confusion": 5,
-      "control": 5,
-      "system_extraction": 4,
-      "prompt_injection": 3,
-      "payload_injection": 3,
-      "many_shot": 2,
-      "code_execution": 1,
-      "crescendo": 1,
-      "encoding_obfuscation": 1,
-      "indirect_injection": 1
+      "system_manipulation": 11,
+      "indirect_injection": 11,
+      "prompt_extraction": 7,
+      "prompt_leak": 4,
+      "response_manipulation": 2,
+      "agent_manipulation": 1
     },
     "source": {
-      "hf:dmtrdr/russian_prompt_injections": 974,
-      "synthetic:template": 3667,
-      "hf:deepset/prompt-injections": 281,
-      "hf:S-Labs/prompt-injection-dataset": 1820,
-      "hf:IlyaGusev/ru_turbo_alpaca": 765,
-      "hf:neuralchemy/Prompt-injection-dataset": 1637,
-      "synthetic:template_short": 36
+      "hf-embedded:deepset/prompt-injections": 67,
+      "hf:deepset/prompt-injections": 37,
+      "hf-embedded:S-Labs/prompt-injection-dataset": 904,
+      "hf:S-Labs/prompt-injection-dataset": 121,
+      "hf-embedded:neuralchemy/Prompt-injection-dataset": 562,
+      "hf:neuralchemy/Prompt-injection-dataset": 87,
+      "hf-embedded:dmtrdr/russian_prompt_injections": 561,
+      "hf:dmtrdr/russian_prompt_injections": 42,
+      "hf-embedded:mt-S-Labs/prompt-injection-dataset": 194,
+      "hf:mt-S-Labs/prompt-injection-dataset": 7,
+      "hf-embedded:mt-neuralchemy/Prompt-injection-dataset": 137,
+      "hf-embedded:mt-deepset/prompt-injections": 11,
+      "hf:mt-neuralchemy/Prompt-injection-dataset": 3,
+      "hf:mt-deepset/prompt-injections": 2,
+      "hf:IlyaGusev/ru_turbo_alpaca": 86,
+      "synthetic:markup": 838,
+      "synthetic-quoted:S-Labs/prompt-inject": 187,
+      "synthetic-quoted:neuralchemy/Prompt-i": 95,
+      "synthetic-quoted:deepset/prompt-injec": 16,
+      "synthetic-quoted:dmtrdr/russian_promp": 183,
+      "synthetic-quoted:mt-S-Labs/prompt-inj": 75,
+      "synthetic-quoted:mt-neuralchemy/Promp": 38,
+      "synthetic-quoted:mt-deepset/prompt-in": 6,
+      "synthetic:template": 1766,
+      "synthetic:template_short": 30
     }
   },
   "val": {
-    "total": 1621,
+    "total": 1010,
     "label": {
-      "attack": 728,
-      "benign": 893
+      "attack": 511,
+      "benign": 499
     },
     "lang": {
-      "ru": 682,
-      "en": 939
+      "en": 573,
+      "ru": 437
     },
     "label_lang": {
-      "attack/ru": 298,
-      "benign/en": 509,
-      "attack/en": 430,
-      "benign/ru": 384
+      "attack/en": 302,
+      "attack/ru": 209,
+      "benign/en": 271,
+      "benign/ru": 228
     },
     "category": {
-      "benign": 755,
-      "direct_injection": 440,
-      "benign_borderline": 138,
-      "role_hijack": 45,
-      "fake_system_message": 44,
-      "hidden_instruction": 42,
-      "instruction_override": 42,
-      "secret_exfiltration": 40,
-      "output_manipulation": 40,
-      "jailbreak": 18,
-      "adversarial": 4,
-      "encoding": 4,
-      "persona_replacement": 3,
+      "direct_injection": 399,
+      "benign": 337,
+      "benign_borderline": 162,
+      "instruction_override": 23,
+      "output_manipulation": 17,
+      "role_hijack": 14,
+      "fake_system_message": 13,
+      "hidden_instruction": 12,
+      "secret_exfiltration": 10,
+      "training_extraction": 6,
+      "system_extraction": 4,
+      "payload_injection": 3,
+      "agent_manipulation": 3,
       "context_confusion": 2,
-      "agent_manipulation": 1,
-      "token_smuggling": 1,
-      "model_fingerprinting": 1,
-      "prompt_extraction": 1
+      "prompt_extraction": 2,
+      "rag_poisoning": 1,
+      "indirect_injection": 1,
+      "prompt_injection": 1
     },
     "source": {
-      "synthetic:template": 649,
-      "hf:dmtrdr/russian_prompt_injections": 172,
-      "hf:neuralchemy/Prompt-injection-dataset": 287,
-      "hf:S-Labs/prompt-injection-dataset": 330,
-      "hf:IlyaGusev/ru_turbo_alpaca": 135,
-      "hf:deepset/prompt-injections": 44,
-      "synthetic:template_short": 4
+      "hf-embedded:deepset/prompt-injections": 11,
+      "hf:deepset/prompt-injections": 6,
+      "hf-embedded:S-Labs/prompt-injection-dataset": 153,
+      "hf:S-Labs/prompt-injection-dataset": 14,
+      "hf-embedded:neuralchemy/Prompt-injection-dataset": 93,
+      "hf:neuralchemy/Prompt-injection-dataset": 21,
+      "hf:dmtrdr/russian_prompt_injections": 7,
+      "hf-embedded:dmtrdr/russian_prompt_injections": 91,
+      "hf-embedded:mt-S-Labs/prompt-injection-dataset": 31,
+      "hf-embedded:mt-neuralchemy/Prompt-injection-dataset": 20,
+      "hf:mt-S-Labs/prompt-injection-dataset": 2,
+      "hf-embedded:mt-deepset/prompt-injections": 8,
+      "hf:IlyaGusev/ru_turbo_alpaca": 14,
+      "synthetic:markup": 152,
+      "synthetic-quoted:S-Labs/prompt-inject": 30,
+      "synthetic-quoted:deepset/prompt-injec": 3,
+      "synthetic-quoted:neuralchemy/Prompt-i": 17,
+      "synthetic-quoted:mt-deepset/prompt-in": 2,
+      "synthetic-quoted:dmtrdr/russian_promp": 29,
+      "synthetic-quoted:mt-neuralchemy/Promp": 8,
+      "synthetic-quoted:mt-S-Labs/prompt-inj": 11,
+      "synthetic:template": 285,
+      "synthetic:template_short": 2
     }
   },
   "golden": {
@@ -138,6 +160,8 @@
     }
   },
   "dedup": {
-    "near_dup": 107
+    "exact_dup": 4,
+    "near_dup": 55,
+    "shingle_overlap": 0
   }
 }

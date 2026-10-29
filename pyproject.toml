@@ -7,8 +7,10 @@ dependencies = [
     "pandas>=3.1.0",
     "pyarrow>=26.0.0",
     "python-dotenv>=1.2.4",
+    "sacremoses>=0.2.0",
     "scikit-learn>=1.9.1",
     "sentence-transformers>=6.2.0",
+    "sentencepiece>=0.2.2",
     "torch>=2.15.0",
 ]
 
