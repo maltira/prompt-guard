@@ -43,7 +43,8 @@ def detector_name(model_name: str, kind: str = "logreg") -> str:
 class EmbeddingDetector(Detector):
     cost_per_1000 = 0.0  # модель работает локально
 
-    def __init__(self, model_name: str = DEFAULT_MODEL, kind: str = "logreg", precomputed: bool = False):
+    def __init__(self, model_name: str = DEFAULT_MODEL, kind: str = "logreg", precomputed: bool = False,
+                 encoder: Encoder | None = None):
         """precomputed - брать эмбеддинги val и golden из кэша (посчитаны вне ноутбука, например в Colab).
 
         тогда задержка в run_eval не включает кодирование текста моделью
@@ -55,7 +56,7 @@ class EmbeddingDetector(Detector):
             raise SystemExit(f"нет обученного классификатора {path}, сначала запустите обучение")
         artifact = joblib.load(path)
         self.clf, self.threshold = artifact["clf"], artifact["threshold"]
-        self.encoder = Encoder(model_name)
+        self.encoder = encoder or Encoder(model_name)  # шлюз передаёт общий кодировщик на все классификаторы модели
         self._lookup = {}
         self.latency_note = None
         if precomputed:

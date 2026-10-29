@@ -28,3 +28,6 @@ results/prompt-tuning-xlmr/**/tokenizer_config.json
 # веса моделей
 *.safetensors
 *.bin
+
+# журнал решений шлюза
+results/gateway/

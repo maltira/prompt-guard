@@ -20,6 +20,7 @@ class CascadeDetector(Detector):
         self.first, self.judge, self.lo, self.hi = first, judge, lo, hi
         self.n_requests = self.n_judged = 0
         self.last_latency_ms = None
+        self.last_stage = None  # имя ступени, принявшей последнее решение
         self.latency_note = "задержка первой ступени замерена вживую, задержка судьи взята из исходных запросов"
 
     def predict(self, text: str) -> tuple[str, float]:
@@ -28,11 +29,14 @@ class CascadeDetector(Detector):
         latency = (time.perf_counter() - t0) * 1000
         self.n_requests += 1
         if p < self.lo:
+            self.last_stage = self.first.name
             self.last_latency_ms, result = latency, ("benign", p)
         elif p > self.hi:
+            self.last_stage = self.first.name
             self.last_latency_ms, result = latency, ("attack", p)
         else:
             self.n_judged += 1
+            self.last_stage = self.judge.name
             result = self.judge.predict(text)
             self.last_latency_ms = latency + (self.judge.last_latency_ms or 0.0)
         return result
