@@ -31,3 +31,16 @@ def test_key_depends_on_inputs(tmp_path):
     # другая модель - другой ключ, общий каталог
     CachedLLM(model="m2", cache_dir=tmp_path, client=fake).complete("q")
     assert fake.n == 4
+
+
+def test_min_interval_spaces_real_calls_but_not_cache_hits(tmp_path):
+    import time
+    fake = FakeClient()
+    llm = CachedLLM(model="m", cache_dir=tmp_path, client=fake, min_interval_s=0.2)
+    t0 = time.monotonic()
+    llm.complete("a")
+    llm.complete("b")
+    assert time.monotonic() - t0 >= 0.2
+    t1 = time.monotonic()
+    llm.complete("a")  # из кэша, без паузы
+    assert time.monotonic() - t1 < 0.1

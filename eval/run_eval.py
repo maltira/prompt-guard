@@ -17,16 +17,27 @@ from pathlib import Path
 from data.golden_hash import GoldenChangedError, verify_file
 from data.schema import read_jsonl
 from detectors.implementations.embeddings import KINDS, EmbeddingDetector, detector_name
+from detectors.implementations.cascade import CascadeDetector, load_thresholds
+from detectors.implementations.judge import JudgeDetector
 from detectors.implementations.keyword import KeywordDetector
 from eval.metrics import bootstrap_ci, scores
 
-# модель -> брать ли эмбеддинги из кэша (large считается в Colab, а не на ноутбуке)
-EMBEDDING_MODELS = {"intfloat/multilingual-e5-small": False, "intfloat/multilingual-e5-base": False,
+# модель -> брать ли эмбеддинги из кэша (все модели считаются в Colab, а не на ноутбуке)
+EMBEDDING_MODELS = {"intfloat/multilingual-e5-small": True, "intfloat/multilingual-e5-base": True,
                     "intfloat/multilingual-e5-large": True}
-DETECTORS = {"keyword": KeywordDetector}
+def build_cascade(first_stage: str) -> CascadeDetector:
+    cfg = load_thresholds(first_stage)
+    return CascadeDetector(first=DETECTORS[first_stage](), judge=JudgeDetector(), lo=cfg["lo"], hi=cfg["hi"])
+
+
+DETECTORS = {"keyword": KeywordDetector, "judge-haiku": JudgeDetector}
+# каскады: первая ступень -> детектор cascade-<первая ступень>
+CASCADE_FIRST_STAGES = ("embeddings-e5-base-mlp", "embeddings-e5-large")
 for _model, _precomputed in EMBEDDING_MODELS.items():
     for _kind in KINDS:
         DETECTORS[detector_name(_model, _kind)] = partial(EmbeddingDetector, _model, _kind, _precomputed)
+for _fs in CASCADE_FIRST_STAGES:
+    DETECTORS["cascade-" + _fs] = partial(build_cascade, _fs)
 MIN_SLICE = 10  # категории меньше этого размера объединяются в одну строку
 SPLITS_DIR = Path("data/splits")
 RESULTS_DIR = Path("results")
@@ -103,18 +114,22 @@ def print_table(rows: list[dict]) -> None:
               f"{fmt(r['fpr'])} | {fmt_ci(r.get('fpr_ci'))} |")
 
 
-def run(detector_name: str, split: str) -> dict:
+def run(detector_name: str, split: str, limit: int | None = None) -> dict:
     path = SPLITS_DIR / f"{split}.jsonl"
     if split == "golden":
         check_golden(path)
-    recs = read_jsonl(path)
+    recs = read_jsonl(path)[:limit]
     detector = DETECTORS[detector_name]()
+    if hasattr(detector, "warm"):
+        detector.warm([r.text for r in recs])  # детекторы с LLM заполняют кэш ответов параллельно
 
     latencies, preds = [], []
     for r in recs:
         t0 = time.perf_counter()
         label, score = detector.predict(r.text)
-        latencies.append((time.perf_counter() - t0) * 1000)
+        measured = (time.perf_counter() - t0) * 1000
+        # у детекторов с LLM задержка берётся из исходного запроса, а не из чтения кэша
+        latencies.append(getattr(detector, "last_latency_ms", None) or measured)
         preds.append((label, score))
 
     y_true = [r.label == "attack" for r in recs]
@@ -128,14 +143,19 @@ def run(detector_name: str, split: str) -> dict:
         "latency_ms": {"p50": percentile(latencies, 0.50), "p95": percentile(latencies, 0.95)},
         "latency_note": getattr(detector, "latency_note", None),
         "cost_per_1000_usd": getattr(detector, "cost_per_1000", None),
+        "usage": getattr(detector, "usage_summary", None),
+        "judged_share": getattr(detector, "judged_share", None),
+        "cascade_thresholds": {"lo": detector.lo, "hi": detector.hi} if hasattr(detector, "lo") else None,
+        "format_errors": len(detector.format_errors) if hasattr(detector, "format_errors") else None,
         "slices": rows,
     }
 
     out_dir = RESULTS_DIR / detector_name
     out_dir.mkdir(parents=True, exist_ok=True)
-    (out_dir / f"{split}.json").write_text(
+    stem = split if limit is None else f"{split}_first{limit}"  # частичный прогон не затирает полный
+    (out_dir / f"{stem}.json").write_text(
         json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
-    with open(out_dir / f"{split}_predictions.jsonl", "w", encoding="utf-8") as f:
+    with open(out_dir / f"{stem}_predictions.jsonl", "w", encoding="utf-8") as f:
         for r, (label, score) in zip(recs, preds):
             f.write(json.dumps({"id": r.id, "label": r.label, "pred": label, "score": score,
                                 "lang": r.lang, "category": r.category, "source": r.source},
@@ -147,11 +167,20 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--detector", required=True, choices=sorted(DETECTORS))
     parser.add_argument("--split", default="golden", choices=["train", "val", "golden"])
+    parser.add_argument("--limit", type=int, default=None, help="взять только первые N примеров (пробный прогон)")
     args = parser.parse_args()
-    summary = run(args.detector, args.split)
+    summary = run(args.detector, args.split, args.limit)
     print(f"детектор: {summary['detector']}, выборка: {summary['split']}, n={summary['n']}")
     print(f"задержка на запрос, мс: p50={summary['latency_ms']['p50']:.4f}, "
           f"p95={summary['latency_ms']['p95']:.4f}")
+    if summary["usage"]:
+        print(f"токенов на запрос: вход {summary['usage']['prompt_tokens_per_request']:.0f}, "
+              f"выход {summary['usage']['completion_tokens_per_request']:.1f}; "
+              f"цена на 1000 запросов: {summary['cost_per_1000_usd'] if summary['cost_per_1000_usd'] is not None else 'цены не заданы в .env'}")
+    if summary["judged_share"] is not None:
+        print(f"доля запросов к судье: {summary['judged_share']:.1%}, пороги: {summary['cascade_thresholds']}")
+    if summary["format_errors"]:
+        print(f"ВНИМАНИЕ: ответов не в формате: {summary['format_errors']} (они считались как атака)")
     print_table(summary["slices"])
 
 
