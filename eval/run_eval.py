@@ -19,6 +19,7 @@ from data.schema import read_jsonl
 from detectors.implementations.embeddings import KINDS, EmbeddingDetector, detector_name
 from detectors.implementations.cascade import CascadeDetector, load_thresholds
 from detectors.implementations.judge import JudgeDetector
+from detectors.implementations.lora import LoraDetector
 from detectors.implementations.keyword import KeywordDetector
 from eval.metrics import bootstrap_ci, scores
 
@@ -30,9 +31,9 @@ def build_cascade(first_stage: str) -> CascadeDetector:
     return CascadeDetector(first=DETECTORS[first_stage](), judge=JudgeDetector(), lo=cfg["lo"], hi=cfg["hi"])
 
 
-DETECTORS = {"keyword": KeywordDetector, "judge-haiku": JudgeDetector}
+DETECTORS = {"keyword": KeywordDetector, "judge-haiku": JudgeDetector, "lora-xlmr": LoraDetector}
 # каскады: первая ступень -> детектор cascade-<первая ступень>
-CASCADE_FIRST_STAGES = ("embeddings-e5-base-mlp", "embeddings-e5-large")
+CASCADE_FIRST_STAGES = ("embeddings-e5-base-mlp", "embeddings-e5-large", "lora-xlmr")
 for _model, _precomputed in EMBEDDING_MODELS.items():
     for _kind in KINDS:
         DETECTORS[detector_name(_model, _kind)] = partial(EmbeddingDetector, _model, _kind, _precomputed)

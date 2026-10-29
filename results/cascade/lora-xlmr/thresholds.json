@@ -1,0 +1,6 @@
+{
+  "first_stage": "lora-xlmr",
+  "lo": 0.1,
+  "hi": 0.5,
+  "chosen_on": "val"
+}

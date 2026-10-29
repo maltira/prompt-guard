@@ -5,6 +5,7 @@ requires-python = ">=3.12"
 dependencies = [
     "openai>=3.40.0",
     "pandas>=3.1.0",
+    "peft>=0.21.2",
     "pyarrow>=26.0.0",
     "python-dotenv>=1.2.4",
     "sacremoses>=0.2.0",
