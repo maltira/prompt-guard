@@ -10,8 +10,8 @@ install: ## поставить зависимости
 test: ## запустить тесты
 	@uv run pytest -q
 
-gateway: ## шлюз локально на порту 8000
-	@uv run uvicorn gateway.app:app --port 8000
+gateway: ## бэкенд (шлюз) локально на порту 8000
+	@uv run uvicorn --app-dir services/backend gateway.app:app --port 8000
 
 build: ## собрать образ (слои из кэша)
 	@docker compose build

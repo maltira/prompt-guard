@@ -12,7 +12,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from gateway.parse import compose_text, parse_mail
@@ -80,8 +79,6 @@ def create_app(registry: Registry | None = None, log_path: Path | None = None) -
     journal = Journal(log_path or Path(os.environ.get("GATEWAY_LOG", DEFAULT_LOG)))
     predict_lock = threading.Lock()  # модели не рассчитаны на параллельные вызовы, нагрузка демонстрационная
     app = FastAPI(title="prompt-guard gateway")
-    # страница демо открывается с другого адреса
-    app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
     @app.get("/health")
     def health():
