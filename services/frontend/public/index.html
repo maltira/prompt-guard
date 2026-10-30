@@ -1,11 +1,81 @@
 <!doctype html>
 <html lang="ru">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>prompt-guard</title>
+  <meta name="color-scheme" content="light">
+  <title>Prompt Guard</title>
+  <link rel="icon"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2318181b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <p>Страница демо в разработке.</p>
+  <div class="app" id="app">
+    <aside class="sidebar" id="sidebar" aria-label="Боковая панель">
+      <div class="sidebar-head">
+        <div class="brand">
+          <span class="brand-mark" data-icon="shield"></span>
+          <span class="brand-name">prompt-guard</span>
+        </div>
+        <button class="icon-btn sidebar-close" id="sidebar-close" type="button" aria-label="Закрыть панель"
+          data-icon="x"></button>
+      </div>
+
+      <button class="btn btn-outline btn-block" id="new-chat" type="button">
+        <span data-icon="plus"></span> Новая проверка
+      </button>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">История</div>
+        <nav class="history" id="history" aria-label="История проверок"></nav>
+      </div>
+    </aside>
+    <div class="scrim" id="scrim"></div>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="icon-btn menu-btn" id="menu-btn" type="button" aria-label="Открыть панель"
+          data-icon="menu"></button>
+        <h1 class="topbar-title" id="topbar-title">Новая проверка</h1>
+        <div class="status" id="status" role="status" aria-live="polite">
+          <span class="status-dot" aria-hidden="true"></span>
+        </div>
+      </header>
+
+      <div class="scroll" id="scroll">
+        <div class="thread" id="thread" aria-live="polite"></div>
+      </div>
+
+      <div class="composer-wrap">
+        <form class="composer" id="composer" autocomplete="off">
+          <input class="composer-subject" id="subject" type="text" placeholder="Тема письма (необязательно)"
+            aria-label="Тема письма" maxlength="300">
+          <textarea class="composer-body" id="body" rows="3" placeholder="Текст письма, можно с HTML-разметкой"
+            aria-label="Текст письма"></textarea>
+          <div class="composer-bar">
+            <label class="select" for="detector">
+              <span class="sr-only">Детектор</span>
+              <select id="detector"></select>
+              <span class="select-chevron" data-icon="chevron"></span>
+            </label>
+            <label class="select" for="template">
+              <span class="sr-only">Шаблон письма</span>
+              <select id="template"></select>
+              <span class="select-chevron" data-icon="chevron"></span>
+            </label>
+            <span class="hint">Ctrl + Enter</span>
+            <button class="send" id="send" type="submit" aria-label="Проверить" data-icon="arrow-up"></button>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <noscript>Для работы страницы нужен JavaScript.</noscript>
+  <script src="examples.js"></script>
+  <script src="app.js"></script>
 </body>
+
 </html>
