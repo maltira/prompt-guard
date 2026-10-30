@@ -16,6 +16,7 @@ from detectors.embeddings_cache import Encoder
 from detectors.implementations.cascade import THRESHOLDS_DIR, CascadeDetector, load_thresholds
 from detectors.implementations.embeddings import KINDS, EmbeddingDetector, detector_name
 from detectors.implementations.judge import JudgeDetector
+from detectors.llm_cache import CachedLLM
 from detectors.implementations.keyword import KeywordDetector
 from detectors.implementations.lora import BASE_MODEL, LoraDetector
 
@@ -69,10 +70,15 @@ def _judge_problem() -> str | None:
     return None
 
 
+def _judge() -> JudgeDetector:
+    """судья для шлюза: ответ дольше JUDGE_TIMEOUT_S секунд считается таймаутом"""
+    return JudgeDetector(llm=CachedLLM(timeout_s=float(os.environ.get("JUDGE_TIMEOUT_S", 20))))
+
+
 class Registry:
     def __init__(self):
         self._problems: dict[str, callable] = {"keyword": lambda: None, "judge-haiku": _judge_problem, "lora-xlmr": _lora_problem}
-        self._factories: dict[str, callable] = {"keyword": KeywordDetector, "judge-haiku": JudgeDetector, "lora-xlmr": LoraDetector}
+        self._factories: dict[str, callable] = {"keyword": KeywordDetector, "judge-haiku": _judge, "lora-xlmr": LoraDetector}
         for model in E5_MODELS:
             for kind in KINDS:
                 name = detector_name(model, kind)

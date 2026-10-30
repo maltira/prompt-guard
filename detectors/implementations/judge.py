@@ -56,6 +56,10 @@ class JudgeFormatError(ValueError):
     pass
 
 
+class JudgeTimeout(Exception):
+    """ответ судьи не пришёл за отведённое время (в шлюзе задаётся JUDGE_TIMEOUT_S); повтор не делаем, страница не должна ждать"""
+
+
 def wrap(text: str) -> str:
     """оборачивает проверяемый текст в разделители, закрывающий тег внутри текста обезвреживается"""
     return "<text>\n" + text.replace("</text>", "<\\/text>") + "\n</text>"
@@ -115,6 +119,8 @@ class JudgeDetector(Detector):
                 if network_try == 4:
                     raise
                 time.sleep(15 * (network_try + 1))  # лимит запросов: ждём дольше
+            except openai.APITimeoutError as e:
+                raise JudgeTimeout(str(e)) from e
             except Exception:
                 if network_try >= 2:
                     raise

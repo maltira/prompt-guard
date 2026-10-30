@@ -14,7 +14,7 @@ DEFAULT_CACHE_DIR = Path("results/cache")
 
 class CachedLLM:
     def __init__(self, model: str | None = None, cache_dir: str | Path = DEFAULT_CACHE_DIR,
-                 client=None, min_interval_s: float | None = None):
+                 client=None, min_interval_s: float | None = None, timeout_s: float | None = None):
         load_dotenv()
         # минимальная пауза между реальными запросами к API (кэш не задерживается), из LLM_MIN_INTERVAL_S
         self.min_interval_s = float(os.environ.get("LLM_MIN_INTERVAL_S", 0)) if min_interval_s is None else min_interval_s
@@ -26,6 +26,7 @@ class CachedLLM:
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self._client = client
+        self.timeout_s = timeout_s  # None: без ограничения, как в экспериментах; шлюз задаёт таймаут и не повторяет запрос
         self.calls = 0  # число реальных обращений к API
         self.last_usage = None  # токены последнего ответа (и из кэша тоже)
         self.last_latency_ms = None  # задержка исходного запроса, не чтения из кэша
@@ -38,7 +39,8 @@ class CachedLLM:
             if not base_url or not key:
                 raise RuntimeError("не заданы ANTHROPIC_BASE_URL и ANTHROPIC_AUTH_TOKEN в .env")
             # openai-клиент сам добавляет /chat/completions, поэтому нужен суффикс /v1
-            self._client = OpenAI(base_url=base_url.rstrip("/") + "/v1", api_key=key)
+            extra = {} if self.timeout_s is None else {"timeout": self.timeout_s, "max_retries": 0}
+            self._client = OpenAI(base_url=base_url.rstrip("/") + "/v1", api_key=key, **extra)
         return self._client
 
     def _key(self, system: str, user: str, temperature: float | None, max_tokens: int) -> str:

@@ -14,6 +14,7 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
+from detectors.implementations.judge import JudgeTimeout
 from gateway.parse import compose_text, parse_mail
 from gateway.registry import Registry
 
@@ -107,7 +108,10 @@ def create_app(registry: Registry | None = None, log_path: Path | None = None) -
         started = time.perf_counter()
         with predict_lock:
             detector = registry.get(name)
-            label, score = detector.predict(text)
+            try:
+                label, score = detector.predict(text)
+            except JudgeTimeout:
+                raise HTTPException(504, "Таймаут")
             stage = getattr(detector, "last_stage", None) or detector.name
         latency_ms = (time.perf_counter() - started) * 1000
         action = "block" if label == "attack" else "allow"
@@ -133,6 +137,9 @@ def create_app(registry: Registry | None = None, log_path: Path | None = None) -
                 try:
                     detector = registry.get(name)
                     label, score = detector.predict(text)
+                except JudgeTimeout:
+                    results.append({"detector": name, "timeout": True, "error": "Таймаут"})
+                    continue
                 except Exception as e:  # сбой одного детектора не должен ломать сравнение
                     results.append({"detector": name, "error": f"{type(e).__name__}: {e}"})
                     continue
