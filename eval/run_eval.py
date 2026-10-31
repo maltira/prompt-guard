@@ -35,7 +35,10 @@ def build_cascade(first_stage: str) -> CascadeDetector:
 DETECTORS = {"keyword": KeywordDetector, "judge-haiku": JudgeDetector, "lora-xlmr": LoraDetector,
              "prompt-tuning-xlmr": PromptTuningDetector}
 # каскады: первая ступень -> детектор cascade-<первая ступень>
-CASCADE_FIRST_STAGES = ("embeddings-e5-base-mlp", "embeddings-e5-large", "lora-xlmr")
+CASCADE_FIRST_STAGES = ("embeddings-e5-base-mlp", "embeddings-e5-large", "lora-xlmr",
+                        "embeddings-e5-small", "embeddings-e5-small-knn", "embeddings-e5-small-mlp",
+                        "embeddings-e5-base", "embeddings-e5-base-knn",
+                        "embeddings-e5-large-knn", "embeddings-e5-large-mlp")
 for _model, _precomputed in EMBEDDING_MODELS.items():
     for _kind in KINDS:
         DETECTORS[detector_name(_model, _kind)] = partial(EmbeddingDetector, _model, _kind, _precomputed)

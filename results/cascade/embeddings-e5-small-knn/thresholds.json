@@ -1,0 +1,6 @@
+{
+  "first_stage": "embeddings-e5-small-knn",
+  "lo": 0.15,
+  "hi": 0.7,
+  "chosen_on": "val"
+}

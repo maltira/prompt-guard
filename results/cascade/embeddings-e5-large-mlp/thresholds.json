@@ -1,0 +1,6 @@
+{
+  "first_stage": "embeddings-e5-large-mlp",
+  "lo": 0.15,
+  "hi": 0.65,
+  "chosen_on": "val"
+}

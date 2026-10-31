@@ -1,0 +1,240 @@
+{
+  "detector": "cascade-embeddings-e5-small",
+  "split": "golden",
+  "n": 450,
+  "latency_ms": {
+    "p50": 0.08037099996727193,
+    "p95": 3688.066693000008
+  },
+  "latency_note": "задержка первой ступени замерена вживую, задержка судьи взята из исходных запросов",
+  "cost_per_1000_usd": 0.10880333333333334,
+  "usage": null,
+  "judged_share": 0.32222222222222224,
+  "cascade_thresholds": {
+    "lo": 0.1,
+    "hi": 0.75
+  },
+  "format_errors": null,
+  "slices": [
+    {
+      "slice": "все",
+      "n": 450,
+      "attacks": 225,
+      "benign": 225,
+      "recall": 0.9111111111111111,
+      "precision": 0.7706766917293233,
+      "f1": 0.8350305498981669,
+      "fpr": 0.27111111111111114,
+      "recall_ci": [
+        0.8720379146919431,
+        0.9462809917355371
+      ],
+      "fpr_ci": [
+        0.2088888888888889,
+        0.33031674208144796
+      ]
+    },
+    {
+      "slice": "lang=en",
+      "n": 200,
+      "attacks": 100,
+      "benign": 100,
+      "recall": 0.92,
+      "precision": 0.71875,
+      "f1": 0.8070175438596492,
+      "fpr": 0.36,
+      "recall_ci": [
+        0.8672566371681416,
+        0.97
+      ],
+      "fpr_ci": [
+        0.26136363636363635,
+        0.45544554455445546
+      ]
+    },
+    {
+      "slice": "lang=ru",
+      "n": 250,
+      "attacks": 125,
+      "benign": 125,
+      "recall": 0.904,
+      "precision": 0.8188405797101449,
+      "f1": 0.8593155893536122,
+      "fpr": 0.2,
+      "recall_ci": [
+        0.8467741935483871,
+        0.9512195121951219
+      ],
+      "fpr_ci": [
+        0.1386861313868613,
+        0.2781954887218045
+      ]
+    },
+    {
+      "slice": "category=benign",
+      "n": 133,
+      "attacks": 0,
+      "benign": 133,
+      "recall": null,
+      "precision": null,
+      "f1": null,
+      "fpr": 0.14285714285714285,
+      "fpr_ci": [
+        0.08270676691729323,
+        0.20300751879699247
+      ]
+    },
+    {
+      "slice": "category=benign_borderline",
+      "n": 92,
+      "attacks": 0,
+      "benign": 92,
+      "recall": null,
+      "precision": null,
+      "f1": null,
+      "fpr": 0.45652173913043476,
+      "fpr_ci": [
+        0.358695652173913,
+        0.5652173913043478
+      ]
+    },
+    {
+      "slice": "category=fake_system_message",
+      "n": 37,
+      "attacks": 37,
+      "benign": 0,
+      "recall": 1.0,
+      "precision": null,
+      "f1": null,
+      "fpr": null,
+      "recall_ci": [
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "slice": "category=hidden_instruction",
+      "n": 40,
+      "attacks": 40,
+      "benign": 0,
+      "recall": 0.85,
+      "precision": null,
+      "f1": null,
+      "fpr": null,
+      "recall_ci": [
+        0.725,
+        0.95
+      ]
+    },
+    {
+      "slice": "category=instruction_override",
+      "n": 37,
+      "attacks": 37,
+      "benign": 0,
+      "recall": 0.918918918918919,
+      "precision": null,
+      "f1": null,
+      "fpr": null,
+      "recall_ci": [
+        0.8108108108108109,
+        1.0
+      ]
+    },
+    {
+      "slice": "category=output_manipulation",
+      "n": 37,
+      "attacks": 37,
+      "benign": 0,
+      "recall": 0.7027027027027027,
+      "precision": null,
+      "f1": null,
+      "fpr": null,
+      "recall_ci": [
+        0.5405405405405406,
+        0.8378378378378378
+      ]
+    },
+    {
+      "slice": "category=role_hijack",
+      "n": 37,
+      "attacks": 37,
+      "benign": 0,
+      "recall": 1.0,
+      "precision": null,
+      "f1": null,
+      "fpr": null,
+      "recall_ci": [
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "slice": "category=secret_exfiltration",
+      "n": 37,
+      "attacks": 37,
+      "benign": 0,
+      "recall": 1.0,
+      "precision": null,
+      "f1": null,
+      "fpr": null,
+      "recall_ci": [
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "slice": "source=custom:handwritten",
+      "n": 200,
+      "attacks": 100,
+      "benign": 100,
+      "recall": 0.92,
+      "precision": 0.71875,
+      "f1": 0.8070175438596492,
+      "fpr": 0.36,
+      "recall_ci": [
+        0.8672566371681416,
+        0.97
+      ],
+      "fpr_ci": [
+        0.26136363636363635,
+        0.45544554455445546
+      ]
+    },
+    {
+      "slice": "source=custom:ru_adapted",
+      "n": 175,
+      "attacks": 100,
+      "benign": 75,
+      "recall": 0.92,
+      "precision": 0.8363636363636363,
+      "f1": 0.8761904761904761,
+      "fpr": 0.24,
+      "recall_ci": [
+        0.8640776699029126,
+        0.9680851063829787
+      ],
+      "fpr_ci": [
+        0.140625,
+        0.345679012345679
+      ]
+    },
+    {
+      "slice": "source=custom:ru_native",
+      "n": 75,
+      "attacks": 25,
+      "benign": 50,
+      "recall": 0.84,
+      "precision": 0.75,
+      "f1": 0.7924528301886793,
+      "fpr": 0.14,
+      "recall_ci": [
+        0.68,
+        0.96875
+      ],
+      "fpr_ci": [
+        0.05172413793103448,
+        0.2413793103448276
+      ]
+    }
+  ]
+}
