@@ -20,6 +20,13 @@ results/lora-xlmr/lora_adapter.zip
 results/lora-xlmr/adapter/README.md
 results/lora-xlmr/adapter/tokenizer.json
 results/lora-xlmr/adapter/tokenizer_config.json
+results/lora-mdeberta/lora_adapter.zip
+results/lora-mdeberta/adapter/README.md
+results/lora-mdeberta/adapter/tokenizer.json
+results/lora-mdeberta/adapter/tokenizer_config.json
+results/lora-mdeberta/adapter/spm.model
+results/lora-mdeberta/adapter/special_tokens_map.json
+results/lora-mdeberta/adapter/added_tokens.json
 results/prompt-tuning-xlmr/**/prompt_adapter.zip
 results/prompt-tuning-xlmr/**/README.md
 results/prompt-tuning-xlmr/**/tokenizer.json

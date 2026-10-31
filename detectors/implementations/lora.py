@@ -55,6 +55,7 @@ class LoraDetector(Detector):
     latency_note = "вероятности из Colab: в задержку не входит работа модели"
     results_dir = RESULTS_DIR  # подклассы (prompt tuning) меняют каталог и ноутбук
     notebook = "notebooks/train_lora.ipynb"
+    base_model = BASE_MODEL  # подклассы с другой базой меняют это поле
 
     def __init__(self, adapter_dir: Path | None = None):
         adapter_dir = adapter_dir or self.results_dir / "adapter"
@@ -71,12 +72,12 @@ class LoraDetector(Detector):
         from peft import PeftModel
         from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-        self._tok = AutoTokenizer.from_pretrained(BASE_MODEL)  # токенизатор у базы и адаптера один
+        self._tok = AutoTokenizer.from_pretrained(self.base_model)  # токенизатор у базы и адаптера один
         try:
             # модель уже в кэше: грузим без обращения к сети
-            base = AutoModelForSequenceClassification.from_pretrained(BASE_MODEL, num_labels=2, local_files_only=True)
+            base = AutoModelForSequenceClassification.from_pretrained(self.base_model, num_labels=2, local_files_only=True)
         except OSError:
-            base = AutoModelForSequenceClassification.from_pretrained(BASE_MODEL, num_labels=2)
+            base = AutoModelForSequenceClassification.from_pretrained(self.base_model, num_labels=2)
         self._model = PeftModel.from_pretrained(base, self.adapter_dir).eval()
 
     @torch.no_grad()

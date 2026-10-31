@@ -1,0 +1,10 @@
+{
+  "threshold": 0.05,
+  "criterion": "максимум F1 на val",
+  "val": {
+    "recall": 1.0,
+    "precision": 1.0,
+    "f1": 1.0,
+    "fpr": 0.0
+  }
+}

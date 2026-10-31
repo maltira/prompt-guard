@@ -1,0 +1,6 @@
+{
+  "first_stage": "embeddings-bge-m3",
+  "lo": 0.1,
+  "hi": 0.85,
+  "chosen_on": "val"
+}

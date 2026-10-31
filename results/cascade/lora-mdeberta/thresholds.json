@@ -1,0 +1,6 @@
+{
+  "first_stage": "lora-mdeberta",
+  "lo": 0.05,
+  "hi": 0.5,
+  "chosen_on": "val"
+}

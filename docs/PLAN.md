@@ -164,13 +164,17 @@ docker-compose.yml
 - Каскад: `eval.cascade_sweep` (пороги на val), `eval.warm_judge_gray_zone` (добор ответов судьи только для новых текстов серой зоны), `eval.run_eval` на golden.
 - Записать результаты в RESULTS.md.
 
-**Шаг 3. Новый энкодер для эмбеддингов (около 3 часов с Colab).**
+**Шаг 3. Новый энкодер для эмбеддингов - выполнен (раздел 13 в RESULTS.md).**
+- Ноутбук готов: `notebooks/embed_bge_m3.ipynb` (в Colab загрузить `train.jsonl`, `val.jsonl`, `golden.jsonl`; архив `bge_m3_embeddings.zip` распаковать в `results/cache/embeddings/`). Код уже умеет модели без префикса `query: `.
+- После Colab локально: `uv run python -m detectors.implementations.embeddings --model BAAI/bge-m3 --kind all --cache-only`, затем `eval.run_eval` для `embeddings-bge-m3`, `-knn`, `-mlp` на val и один раз на golden; каскады: `eval.warm_judge_gray_zone`, `eval.cascade_sweep`, `eval.run_eval --detector cascade-<имя>`; затем `python -m eval.add_metrics`.
 - Colab: посчитать эмбеддинги train, val и golden новой моделью, положить в `results/cache/embeddings/` (как для e5).
 - Локально: `detectors/implementations/embeddings.py --model <модель> --kind all`, затем прогон val и golden для трёх классификаторов.
 - Каскады для трёх вариантов (пороги на val, добор ответов судьи, golden). Ожидаемый расход: до нескольких сотен запросов к судье на вариант, порядка 1 млн токенов на вариант в худшем случае.
 - Добавить модель в `EMBEDDING_MODELS` в `eval/run_eval.py` и в таблицы и графики.
 
-**Шаг 4. Новая база для LoRA (около 4 часов с Colab).**
+**Шаг 4. Новая база для LoRA - выполнен (раздел 13 в RESULTS.md).**
+- Ноутбук готов: `notebooks/train_lora_mdeberta.ipynb` (в Colab загрузить `train.jsonl` и `val.jsonl`, `golden.jsonl` попросит только в конце; архив `lora_adapter.zip` распаковать в `results/lora-mdeberta/adapter/`). Детектор `lora-mdeberta` зарегистрирован в `eval/run_eval.py`.
+- После Colab локально: `uv run python -m detectors.implementations.lora_mdeberta --tune` (порог по val), `eval.run_eval --detector lora-mdeberta` на val и один раз на golden, каскад как выше.
 - Colab: `notebooks/train_lora.ipynb` с `BASE_MODEL=microsoft/mdeberta-v3-base`; получить адаптер и вероятности для val и golden.
 - Локально: параметризовать `detectors/implementations/lora.py` по базе (сейчас константа `BASE_MODEL`), подобрать порог на val, прогнать golden.
 - Каскад «LoRA mdeberta → судья» тем же способом, что в шаге 2.

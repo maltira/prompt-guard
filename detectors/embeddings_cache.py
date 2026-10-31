@@ -13,9 +13,10 @@ SPLITS_DIR = Path("data/splits")
 
 
 class Encoder:
-    def __init__(self, model_name: str, prefix: str = "query: "):
+    def __init__(self, model_name: str, prefix: str | None = None):
         self.model_name = model_name
-        self.prefix = prefix  # e5 требует префикс query: перед каждым текстом
+        # e5 требует префикс query: перед каждым текстом, у bge-m3 и большинства других моделей префикса нет
+        self.prefix = prefix if prefix is not None else ("query: " if "e5" in model_name.lower() else "")
         self._model = None
 
     @property

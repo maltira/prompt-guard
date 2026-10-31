@@ -1,0 +1,6 @@
+{
+  "first_stage": "embeddings-bge-m3-knn",
+  "lo": 0.25,
+  "hi": 0.6,
+  "chosen_on": "val"
+}
