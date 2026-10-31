@@ -1,0 +1,6 @@
+{
+  "first_stage": "tfidf-logreg",
+  "lo": 0.4,
+  "hi": 0.55,
+  "chosen_on": "val"
+}

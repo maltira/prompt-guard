@@ -22,6 +22,7 @@ from detectors.implementations.judge import JudgeDetector
 from detectors.implementations.lora import LoraDetector
 from detectors.implementations.prompt_tuning import PromptTuningDetector
 from detectors.implementations.keyword import KeywordDetector
+from detectors.implementations.tfidf import TfidfDetector
 from eval.metrics import bootstrap_auc_ci, bootstrap_ci, roc_auc, scores
 
 # модель -> брать ли эмбеддинги из кэша (все модели считаются в Colab, а не на ноутбуке)
@@ -33,12 +34,12 @@ def build_cascade(first_stage: str) -> CascadeDetector:
 
 
 DETECTORS = {"keyword": KeywordDetector, "judge-haiku": JudgeDetector, "lora-xlmr": LoraDetector,
-             "prompt-tuning-xlmr": PromptTuningDetector}
+             "prompt-tuning-xlmr": PromptTuningDetector, "tfidf-logreg": TfidfDetector}
 # каскады: первая ступень -> детектор cascade-<первая ступень>
 CASCADE_FIRST_STAGES = ("embeddings-e5-base-mlp", "embeddings-e5-large", "lora-xlmr",
                         "embeddings-e5-small", "embeddings-e5-small-knn", "embeddings-e5-small-mlp",
                         "embeddings-e5-base", "embeddings-e5-base-knn",
-                        "embeddings-e5-large-knn", "embeddings-e5-large-mlp")
+                        "embeddings-e5-large-knn", "embeddings-e5-large-mlp", "tfidf-logreg")
 for _model, _precomputed in EMBEDDING_MODELS.items():
     for _kind in KINDS:
         DETECTORS[detector_name(_model, _kind)] = partial(EmbeddingDetector, _model, _kind, _precomputed)

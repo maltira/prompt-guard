@@ -153,12 +153,12 @@ docker-compose.yml
 
 Порядок выбран так, чтобы сначала сделать то, что не требует GPU и новых запросов к судье.
 
-**Шаг 1. Метрики (около 1 часа).**
+**Шаг 1. Метрики - выполнен (раздел 11 в RESULTS.md).**
 - В `eval/metrics.py` добавить MCC и ROC AUC; вывести их в `eval/run_eval.py` рядом с остальными метриками.
 - Пересчитать val и golden для уже готовых детекторов (все предсказания лежат в `results/*/`, запросов к судье нет).
 - Добавить колонки MCC и ROC AUC в таблицы `docs/RESULTS.md`.
 
-**Шаг 2. TF-IDF (около 2 часов).**
+**Шаг 2. TF-IDF - выполнен (раздел 12 в RESULTS.md).**
 - `detectors/implementations/tfidf.py`: TfidfVectorizer (слова и символьные n-граммы, для русского и английского) + логрегрессия; обучение на train, подбор C и порога на val.
 - Прогнать val и golden, записать в `results/tfidf-logreg/`.
 - Каскад: `eval.cascade_sweep` (пороги на val), `eval.warm_judge_gray_zone` (добор ответов судьи только для новых текстов серой зоны), `eval.run_eval` на golden.
