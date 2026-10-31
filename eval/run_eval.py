@@ -22,7 +22,7 @@ from detectors.implementations.judge import JudgeDetector
 from detectors.implementations.lora import LoraDetector
 from detectors.implementations.prompt_tuning import PromptTuningDetector
 from detectors.implementations.keyword import KeywordDetector
-from eval.metrics import bootstrap_ci, scores
+from eval.metrics import bootstrap_auc_ci, bootstrap_ci, roc_auc, scores
 
 # модель -> брать ли эмбеддинги из кэша (все модели считаются в Colab, а не на ноутбуке)
 EMBEDDING_MODELS = {"intfloat/multilingual-e5-small": True, "intfloat/multilingual-e5-base": True,
@@ -65,7 +65,7 @@ def report_row(name: str, y_true: list[bool], y_pred: list[bool]) -> dict:
     s = scores(y_true, y_pred)
     if not (s["attacks"] and s["benign"]):
         # precision и F1 имеют смысл только когда в срезе есть оба класса
-        s["precision"] = s["f1"] = None
+        s["precision"] = s["f1"] = s["mcc"] = None
     row = {"slice": name, **s}
     if s["attacks"]:
         row["recall_ci"] = bootstrap_ci(y_true, y_pred, "recall")
@@ -112,12 +112,13 @@ def fmt_ci(ci):
 
 
 def print_table(rows: list[dict]) -> None:
-    print("| срез | n | атак | безоп. | recall | 95% CI | precision | F1 | FPR | 95% CI |")
-    print("|---|---|---|---|---|---|---|---|---|---|")
+    print("| срез | n | атак | безоп. | recall | 95% CI | precision | F1 | MCC | FPR | 95% CI | ROC AUC [95% CI] |")
+    print("|---|---|---|---|---|---|---|---|---|---|---|---|")
     for r in rows:
         print(f"| {r['slice']} | {r['n']} | {r['attacks']} | {r['benign']} | {fmt(r['recall'])} | "
-              f"{fmt_ci(r.get('recall_ci'))} | {fmt(r['precision'])} | {fmt(r['f1'])} | "
-              f"{fmt(r['fpr'])} | {fmt_ci(r.get('fpr_ci'))} |")
+              f"{fmt_ci(r.get('recall_ci'))} | {fmt(r['precision'])} | {fmt(r['f1'])} | {fmt(r.get('mcc'))} | "
+              f"{fmt(r['fpr'])} | {fmt_ci(r.get('fpr_ci'))} | "
+              f"{fmt(r.get('roc_auc')) + ' ' + fmt_ci(r.get('roc_auc_ci')) if r.get('roc_auc') is not None else '-'} |")
 
 
 def run(detector_name: str, split: str, limit: int | None = None) -> dict:
@@ -141,6 +142,11 @@ def run(detector_name: str, split: str, limit: int | None = None) -> dict:
     y_true = [r.label == "attack" for r in recs]
     y_pred = [label == "attack" for label, _ in preds]
     rows = build_slices(recs, y_true, y_pred)
+    # ROC AUC только у детекторов с честной оценкой вероятности; у каскада оценка смешанная (первая ступень и судья)
+    if not hasattr(detector, "lo"):
+        y_score = [score for _, score in preds]
+        rows[0]["roc_auc"] = roc_auc(y_true, y_score)
+        rows[0]["roc_auc_ci"] = bootstrap_auc_ci(y_true, y_score)
 
     summary = {
         "detector": detector_name,

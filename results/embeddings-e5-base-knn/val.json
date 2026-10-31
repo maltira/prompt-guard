@@ -29,6 +29,12 @@
       "fpr_ci": [
         0.45788336933045354,
         0.5465587044534413
+      ],
+      "mcc": 0.36347112769365386,
+      "roc_auc": 0.7565345956100067,
+      "roc_auc_ci": [
+        0.7274568288854003,
+        0.7847026162243553
       ]
     },
     {
@@ -47,7 +53,8 @@
       "fpr_ci": [
         0.515625,
         0.6363636363636364
-      ]
+      ],
+      "mcc": 0.36399003653068757
     },
     {
       "slice": "lang=ru",
@@ -65,7 +72,8 @@
       "fpr_ci": [
         0.35096153846153844,
         0.4769874476987448
-      ]
+      ],
+      "mcc": 0.35865540832260207
     },
     {
       "slice": "category=benign",
@@ -79,7 +87,8 @@
       "fpr_ci": [
         0.44807121661721067,
         0.5489614243323442
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "category=benign_borderline",
@@ -93,7 +102,8 @@
       "fpr_ci": [
         0.43209876543209874,
         0.5925925925925926
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "category=direct_injection",
@@ -107,7 +117,8 @@
       "recall_ci": [
         0.8345864661654135,
         0.899749373433584
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "category=fake_system_message",
@@ -121,7 +132,8 @@
       "recall_ci": [
         0.46153846153846156,
         0.9230769230769231
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "category=hidden_instruction",
@@ -135,7 +147,8 @@
       "recall_ci": [
         0.25,
         0.75
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "category=instruction_override",
@@ -149,7 +162,8 @@
       "recall_ci": [
         0.6956521739130435,
         1.0
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "category=output_manipulation",
@@ -163,7 +177,8 @@
       "recall_ci": [
         0.4117647058823529,
         0.8235294117647058
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "category=role_hijack",
@@ -177,7 +192,8 @@
       "recall_ci": [
         0.7857142857142857,
         1.0
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "category=secret_exfiltration",
@@ -191,7 +207,8 @@
       "recall_ci": [
         0.5,
         1.0
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "category=прочие (меньше 10 примеров)",
@@ -219,7 +236,8 @@
       "recall_ci": [
         0.8431372549019608,
         0.9411764705882353
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=hf-embedded:deepset/prompt-injections",
@@ -233,7 +251,8 @@
       "recall_ci": [
         0.7272727272727273,
         1.0
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=hf-embedded:dmtrdr/russian_prompt_injections",
@@ -247,7 +266,8 @@
       "recall_ci": [
         0.6923076923076923,
         0.8571428571428571
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=hf-embedded:mt-S-Labs/prompt-injection-dataset",
@@ -261,7 +281,8 @@
       "recall_ci": [
         0.5161290322580645,
         0.8709677419354839
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=hf-embedded:mt-deepset/prompt-injections",
@@ -275,7 +296,8 @@
       "recall_ci": [
         0.5,
         1.0
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=hf-embedded:mt-neuralchemy/Prompt-injection-dataset",
@@ -289,7 +311,8 @@
       "recall_ci": [
         0.6,
         0.95
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=hf-embedded:neuralchemy/Prompt-injection-dataset",
@@ -303,7 +326,8 @@
       "recall_ci": [
         0.8709677419354839,
         0.967741935483871
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=hf:IlyaGusev/ru_turbo_alpaca",
@@ -317,7 +341,8 @@
       "fpr_ci": [
         0.5,
         0.9285714285714286
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=hf:S-Labs/prompt-injection-dataset",
@@ -335,7 +360,8 @@
       "fpr_ci": [
         0.0,
         0.6666666666666666
-      ]
+      ],
+      "mcc": 0.7453559924999299
     },
     {
       "slice": "source=hf:deepset/prompt-injections",
@@ -353,7 +379,8 @@
       "fpr_ci": [
         0.16666666666666666,
         1.0
-      ]
+      ],
+      "mcc": 0.31622776601683794
     },
     {
       "slice": "source=hf:dmtrdr/russian_prompt_injections",
@@ -367,7 +394,8 @@
       "recall_ci": [
         1.0,
         1.0
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=hf:mt-S-Labs/prompt-injection-dataset",
@@ -381,7 +409,8 @@
       "recall_ci": [
         1.0,
         1.0
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=hf:neuralchemy/Prompt-injection-dataset",
@@ -399,7 +428,8 @@
       "fpr_ci": [
         0.2,
         0.7857142857142857
-      ]
+      ],
+      "mcc": 0.5477225575051661
     },
     {
       "slice": "source=synthetic-quoted:S-Labs/prompt-inject",
@@ -413,7 +443,8 @@
       "fpr_ci": [
         0.5,
         0.8333333333333334
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=synthetic-quoted:deepset/prompt-injec",
@@ -427,7 +458,8 @@
       "fpr_ci": [
         0.0,
         1.0
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=synthetic-quoted:dmtrdr/russian_promp",
@@ -441,7 +473,8 @@
       "fpr_ci": [
         0.20689655172413793,
         0.5517241379310345
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=synthetic-quoted:mt-S-Labs/prompt-inj",
@@ -455,7 +488,8 @@
       "fpr_ci": [
         0.0,
         0.5454545454545454
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=synthetic-quoted:mt-deepset/prompt-in",
@@ -469,7 +503,8 @@
       "fpr_ci": [
         0.0,
         0.0
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=synthetic-quoted:mt-neuralchemy/Promp",
@@ -483,7 +518,8 @@
       "fpr_ci": [
         0.0,
         0.375
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=synthetic-quoted:neuralchemy/Prompt-i",
@@ -497,7 +533,8 @@
       "fpr_ci": [
         0.5882352941176471,
         0.9411764705882353
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=synthetic:markup",
@@ -511,7 +548,8 @@
       "fpr_ci": [
         0.3815789473684211,
         0.5394736842105263
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=synthetic:template",
@@ -529,7 +567,8 @@
       "fpr_ci": [
         0.46464646464646464,
         0.5979899497487438
-      ]
+      ],
+      "mcc": 0.18046345318853696
     },
     {
       "slice": "source=synthetic:template_short",
@@ -543,7 +582,8 @@
       "fpr_ci": [
         0.0,
         0.0
-      ]
+      ],
+      "mcc": null
     }
   ]
 }

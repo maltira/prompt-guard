@@ -29,6 +29,12 @@
       "fpr_ci": [
         0.19004524886877827,
         0.30434782608695654
+      ],
+      "mcc": 0.5794340356355437,
+      "roc_auc": 0.8856296296296297,
+      "roc_auc_ci": [
+        0.8511546978804176,
+        0.9141970918286708
       ]
     },
     {
@@ -47,7 +53,8 @@
       "fpr_ci": [
         0.22340425531914893,
         0.39603960396039606
-      ]
+      ],
+      "mcc": 0.5805757147845338
     },
     {
       "slice": "lang=ru",
@@ -65,7 +72,8 @@
       "fpr_ci": [
         0.13333333333333333,
         0.2676056338028169
-      ]
+      ],
+      "mcc": 0.5840747663554465
     },
     {
       "slice": "category=benign",
@@ -79,7 +87,8 @@
       "fpr_ci": [
         0.05263157894736842,
         0.15037593984962405
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "category=benign_borderline",
@@ -93,7 +102,8 @@
       "fpr_ci": [
         0.358695652173913,
         0.5652173913043478
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "category=fake_system_message",
@@ -107,7 +117,8 @@
       "recall_ci": [
         1.0,
         1.0
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "category=hidden_instruction",
@@ -121,7 +132,8 @@
       "recall_ci": [
         0.475,
         0.775
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "category=instruction_override",
@@ -135,7 +147,8 @@
       "recall_ci": [
         0.5945945945945946,
         0.8648648648648649
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "category=output_manipulation",
@@ -149,7 +162,8 @@
       "recall_ci": [
         0.5405405405405406,
         0.8378378378378378
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "category=role_hijack",
@@ -163,7 +177,8 @@
       "recall_ci": [
         0.8648648648648649,
         1.0
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "category=secret_exfiltration",
@@ -177,7 +192,8 @@
       "recall_ci": [
         0.918918918918919,
         1.0
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=custom:handwritten",
@@ -195,7 +211,8 @@
       "fpr_ci": [
         0.22340425531914893,
         0.39603960396039606
-      ]
+      ],
+      "mcc": 0.5805757147845338
     },
     {
       "slice": "source=custom:ru_adapted",
@@ -213,7 +230,8 @@
       "fpr_ci": [
         0.1282051282051282,
         0.3287671232876712
-      ]
+      ],
+      "mcc": 0.5815526314990442
     },
     {
       "slice": "source=custom:ru_native",
@@ -231,7 +249,8 @@
       "fpr_ci": [
         0.0625,
         0.2653061224489796
-      ]
+      ],
+      "mcc": 0.52
     }
   ]
 }

@@ -29,6 +29,12 @@
       "fpr_ci": [
         0.059548254620123205,
         0.1075050709939148
+      ],
+      "mcc": 0.8044668306870314,
+      "roc_auc": 0.961641482573758,
+      "roc_auc_ci": [
+        0.9514261929444288,
+        0.970917261100462
       ]
     },
     {
@@ -47,7 +53,8 @@
       "fpr_ci": [
         0.07092198581560284,
         0.14285714285714285
-      ]
+      ],
+      "mcc": 0.8179400919176543
     },
     {
       "slice": "lang=ru",
@@ -65,7 +72,8 @@
       "fpr_ci": [
         0.025974025974025976,
         0.08296943231441048
-      ]
+      ],
+      "mcc": 0.7879316613021159
     },
     {
       "slice": "category=benign",
@@ -79,7 +87,8 @@
       "fpr_ci": [
         0.04747774480712166,
         0.10089020771513353
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "category=benign_borderline",
@@ -93,7 +102,8 @@
       "fpr_ci": [
         0.05555555555555555,
         0.16049382716049382
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "category=direct_injection",
@@ -107,7 +117,8 @@
       "recall_ci": [
         0.8646616541353384,
         0.9223057644110275
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "category=fake_system_message",
@@ -121,7 +132,8 @@
       "recall_ci": [
         1.0,
         1.0
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "category=hidden_instruction",
@@ -135,7 +147,8 @@
       "recall_ci": [
         0.4166666666666667,
         0.9166666666666666
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "category=instruction_override",
@@ -149,7 +162,8 @@
       "recall_ci": [
         1.0,
         1.0
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "category=output_manipulation",
@@ -163,7 +177,8 @@
       "recall_ci": [
         0.29411764705882354,
         0.7647058823529411
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "category=role_hijack",
@@ -177,7 +192,8 @@
       "recall_ci": [
         1.0,
         1.0
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "category=secret_exfiltration",
@@ -191,7 +207,8 @@
       "recall_ci": [
         1.0,
         1.0
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "category=прочие (меньше 10 примеров)",
@@ -219,7 +236,8 @@
       "recall_ci": [
         0.8888888888888888,
         0.9607843137254902
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=hf-embedded:deepset/prompt-injections",
@@ -233,7 +251,8 @@
       "recall_ci": [
         0.7272727272727273,
         1.0
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=hf-embedded:dmtrdr/russian_prompt_injections",
@@ -247,7 +266,8 @@
       "recall_ci": [
         0.7692307692307693,
         0.9120879120879121
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=hf-embedded:mt-S-Labs/prompt-injection-dataset",
@@ -261,7 +281,8 @@
       "recall_ci": [
         0.7419354838709677,
         0.967741935483871
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=hf-embedded:mt-deepset/prompt-injections",
@@ -275,7 +296,8 @@
       "recall_ci": [
         1.0,
         1.0
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=hf-embedded:mt-neuralchemy/Prompt-injection-dataset",
@@ -289,7 +311,8 @@
       "recall_ci": [
         0.65,
         0.95
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=hf-embedded:neuralchemy/Prompt-injection-dataset",
@@ -303,7 +326,8 @@
       "recall_ci": [
         0.8602150537634409,
         0.967741935483871
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=hf:IlyaGusev/ru_turbo_alpaca",
@@ -317,7 +341,8 @@
       "fpr_ci": [
         0.0,
         0.35714285714285715
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=hf:S-Labs/prompt-injection-dataset",
@@ -335,7 +360,8 @@
       "fpr_ci": [
         0.0,
         0.0
-      ]
+      ],
+      "mcc": 1.0
     },
     {
       "slice": "source=hf:deepset/prompt-injections",
@@ -353,7 +379,8 @@
       "fpr_ci": [
         0.0,
         0.6
-      ]
+      ],
+      "mcc": 0.6324555320336759
     },
     {
       "slice": "source=hf:dmtrdr/russian_prompt_injections",
@@ -367,7 +394,8 @@
       "recall_ci": [
         0.42857142857142855,
         1.0
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=hf:mt-S-Labs/prompt-injection-dataset",
@@ -381,7 +409,8 @@
       "recall_ci": [
         0.0,
         1.0
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=hf:neuralchemy/Prompt-injection-dataset",
@@ -399,7 +428,8 @@
       "fpr_ci": [
         0.0,
         0.0
-      ]
+      ],
+      "mcc": 0.9058216273156766
     },
     {
       "slice": "source=synthetic-quoted:S-Labs/prompt-inject",
@@ -413,7 +443,8 @@
       "fpr_ci": [
         0.06666666666666667,
         0.3333333333333333
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=synthetic-quoted:deepset/prompt-injec",
@@ -427,7 +458,8 @@
       "fpr_ci": [
         0.0,
         0.0
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=synthetic-quoted:dmtrdr/russian_promp",
@@ -441,7 +473,8 @@
       "fpr_ci": [
         0.0,
         0.10344827586206896
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=synthetic-quoted:mt-S-Labs/prompt-inj",
@@ -455,7 +488,8 @@
       "fpr_ci": [
         0.0,
         0.0
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=synthetic-quoted:mt-deepset/prompt-in",
@@ -469,7 +503,8 @@
       "fpr_ci": [
         0.0,
         0.0
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=synthetic-quoted:mt-neuralchemy/Promp",
@@ -483,7 +518,8 @@
       "fpr_ci": [
         0.0,
         0.375
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=synthetic-quoted:neuralchemy/Prompt-i",
@@ -497,7 +533,8 @@
       "fpr_ci": [
         0.0,
         0.29411764705882354
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=synthetic:markup",
@@ -511,7 +548,8 @@
       "fpr_ci": [
         0.02631578947368421,
         0.1118421052631579
-      ]
+      ],
+      "mcc": null
     },
     {
       "slice": "source=synthetic:template",
@@ -529,7 +567,8 @@
       "fpr_ci": [
         0.050505050505050504,
         0.12871287128712872
-      ]
+      ],
+      "mcc": 0.7424196724702354
     },
     {
       "slice": "source=synthetic:template_short",
@@ -543,7 +582,8 @@
       "fpr_ci": [
         0.0,
         0.0
-      ]
+      ],
+      "mcc": null
     }
   ]
 }
