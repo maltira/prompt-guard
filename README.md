@@ -21,7 +21,7 @@
 2. Даёт ли каскад «быстрый фильтр → точный судья» качество судьи по цене фильтра?
 3. Насколько детектор устойчив к атакам, подстроенным под него, и помогает ли дообучение? (не оценивалось, см. этап 7 в [PLAN.md](docs/PLAN.md))
 
-Сравниваемые подходы: эмбеддинги + классификатор, LoRA, prompt tuning, LLM как судья (Haiku 5.5), каскад. Оценка идёт на отдельном вручную написанном наборе golden (русский и английский). Все тестовые данные безобидны.
+Сравниваемые подходы: ключевые слова, TF-IDF + логрегрессия, эмбеддинги (e5, bge-m3) + классификатор, LoRA (xlm-roberta-base, mdeberta-v3-base), prompt tuning, LLM как судья (Haiku 5.5), каскад. Оценка идёт на отдельном вручную написанном наборе golden (русский и английский). Все тестовые данные безобидны.
 
 ## Как запустить
 
@@ -40,9 +40,9 @@ uv run python -m detectors.implementations.embeddings --model intfloat/multiling
 uv run python -m eval.run_eval --detector embeddings-e5-base-mlp --split val
 ```
 
-- Детекторы для `--detector`: `keyword`, `embeddings-e5-{small,base,large}` и с суффиксом `-knn` или `-mlp`.
+- Детекторы для `--detector`: `keyword`, `tfidf-logreg`, `embeddings-{e5-small,e5-base,e5-large,bge-m3}` и с суффиксом `-knn` или `-mlp`, `lora-xlmr`, `lora-mdeberta`, `prompt-tuning-xlmr`, `judge-haiku` и каскады `cascade-<первая ступень>`.
 - Для разработки используйте `--split val`; `golden` только для итоговых цифр.
-- Эмбеддинги всех трёх моделей e5 считаются в Colab на GPU ([notebooks/embed_e5.ipynb](notebooks/embed_e5.ipynb)), результат кладётся в `results/cache/embeddings/`. Классификаторы обучаются локально с флагом `--cache-only`.
+- Эмбеддинги e5 ([notebooks/embed_e5.ipynb](notebooks/embed_e5.ipynb)) и bge-m3 ([notebooks/embed_bge_m3.ipynb](notebooks/embed_bge_m3.ipynb)) считаются в Colab на GPU, LoRA на mdeberta обучается в [notebooks/train_lora_mdeberta.ipynb](notebooks/train_lora_mdeberta.ipynb); результат эмбеддингов кладётся в `results/cache/embeddings/`. Классификаторы обучаются локально с флагом `--cache-only`.
 
 ## Структура
 
