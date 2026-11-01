@@ -1,4 +1,4 @@
-"""графики результатов на golden: тепловая карта эмбеддингов, точечный график качества и столбцы F1
+"""графики результатов на golden: тепловая карта эмбеддингов, точечные графики качества и цены, столбцы F1
 
 использование: uv run python -m eval.plot_results
 все значения читаются из results/*/golden.json, те же файлы, что дают таблицы в RESULTS.md
@@ -20,11 +20,13 @@ OUT_DIR = RESULTS_DIR / "figures"
 SURFACE, INK, INK_2, GRID = "#fcfcfb", "#0b0b0b", "#52514e", "#e4e3df"
 EMB, LORA, CASCADE, JUDGE = "#2a78d6", "#1baf7a", "#52514e", "#eb6834"
 KEYWORD, PROMPT = "#9ca3af", "#b45309"
+BGE, TFIDF, LORA2 = "#0e9aa7", "#8e5ac8", "#0f7a55"
 
 SIZES = [("small", "e5-small"), ("base", "e5-base"), ("large", "e5-large")]
 CLASSIFIERS = [("", "логрегрессия"), ("-knn", "kNN"), ("-mlp", "MLP")]
+MODELS = [(f"embeddings-e5-{s}", n) for s, n in SIZES] + [("embeddings-bge-m3", "bge-m3")]
 
-# смещение подписи в пунктах (dx, dy) и выравнивание: точки эмбеддингов лежат близко друг к другу
+# смещение подписи в пунктах (dx, dy) и выравнивание: точки на картах лежат близко друг к другу
 OFFSET = {
     "e5-small + логрегрессия": (6, -10, "left"),
     "e5-small + MLP": (6, 6, "left"),
@@ -35,7 +37,9 @@ OFFSET = {
     "e5-large + логрегрессия": (-8, -2, "right"),
     "e5-large + MLP": (-8, -10, "right"),
     "e5-large + kNN": (-8, 8, "right"),
-    "LoRA": (10, 4, "left"),
+    "TF-IDF + логрегрессия": (0, 11, "center"),
+    "LoRA xlm-roberta": (10, 4, "left"),
+    "LoRA mdeberta": (-10, -12, "right"),
     "каскад LoRA → судья": (6, -14, "left"),
     "каскад e5-base → судья": (6, 6, "left"),
     "каскад e5-large → судья": (-8, -8, "right"),
@@ -55,6 +59,10 @@ def golden(name: str) -> dict:
     return next(r for r in data["slices"] if r["slice"] == "все")
 
 
+def meta(name: str) -> dict:
+    return json.loads((RESULTS_DIR / name / "golden.json").read_text(encoding="utf-8"))
+
+
 def style(fig, ax) -> None:
     fig.patch.set_facecolor(SURFACE)
     ax.set_facecolor(SURFACE)
@@ -71,20 +79,44 @@ def save(fig, path: Path) -> None:
     plt.close(fig)
 
 
+def stages() -> list[dict]:
+    """все первые ступени без судьи: эмбеддинги (e5 и bge-m3) с тремя классификаторами, TF-IDF и две базы LoRA"""
+    out = []
+    for prefix, model_name in MODELS:
+        color = BGE if "bge" in prefix else EMB
+        for c, cn in CLASSIFIERS:
+            out.append({"label": f"{model_name} + {cn}", "name": prefix + c, "color": color, "marker": "o", "size": 70})
+    out.append({"label": "TF-IDF + логрегрессия", "name": "tfidf-logreg", "color": TFIDF, "marker": "s", "size": 70})
+    out.append({"label": "LoRA xlm-roberta", "name": "lora-xlmr", "color": LORA, "marker": "*", "size": 200})
+    out.append({"label": "LoRA mdeberta", "name": "lora-mdeberta", "color": LORA2, "marker": "*", "size": 200})
+    return out
+
+
+def family_handles(with_prompt: bool = True, singles_label: str = "без судьи") -> list:
+    h = [
+        Line2D([], [], marker="o", color=EMB, linestyle="", label=f"эмбеддинги e5 ({singles_label})"),
+        Line2D([], [], marker="o", color=BGE, linestyle="", label=f"эмбеддинги bge-m3 ({singles_label})"),
+        Line2D([], [], marker="s", color=TFIDF, linestyle="", label=f"TF-IDF ({singles_label})"),
+        Line2D([], [], marker="*", color=LORA, linestyle="", markersize=12, label=f"LoRA xlm-roberta ({singles_label})"),
+        Line2D([], [], marker="*", color=LORA2, linestyle="", markersize=12, label=f"LoRA mdeberta ({singles_label})"),
+    ]
+    return h
+
+
 def heatmap(out: Path) -> None:
-    f1 = np.array([[golden(f"embeddings-e5-{s}{c}")["f1"] for c, _ in CLASSIFIERS] for s, _ in SIZES])
-    fpr = np.array([[golden(f"embeddings-e5-{s}{c}")["fpr"] for c, _ in CLASSIFIERS] for s, _ in SIZES])
-    fig, ax = plt.subplots(figsize=(7.5, 4.2))
+    f1 = np.array([[golden(prefix + c)["f1"] for c, _ in CLASSIFIERS] for prefix, _ in MODELS])
+    fpr = np.array([[golden(prefix + c)["fpr"] for c, _ in CLASSIFIERS] for prefix, _ in MODELS])
+    fig, ax = plt.subplots(figsize=(7.5, 5.4))
     style(fig, ax)
     im = ax.imshow(f1, cmap="Blues", vmin=0.6, vmax=0.85)
-    for i in range(len(SIZES)):
+    for i in range(len(MODELS)):
         for j in range(len(CLASSIFIERS)):
             ax.text(j, i, f"F1 {ru(f1[i, j])}\nFPR {ru(fpr[i, j])}", ha="center", va="center",
                     color="white" if f1[i, j] > 0.75 else INK, fontsize=10)
     ax.set_xticks(range(len(CLASSIFIERS)))
     ax.set_xticklabels([n for _, n in CLASSIFIERS])
-    ax.set_yticks(range(len(SIZES)))
-    ax.set_yticklabels([n for _, n in SIZES])
+    ax.set_yticks(range(len(MODELS)))
+    ax.set_yticklabels([n for _, n in MODELS])
     ax.spines[:].set_visible(False)
     ax.set_title("Эмбеддинги на golden: модель × классификатор", loc="left", color=INK, fontsize=12)
     cbar = fig.colorbar(im, ax=ax, fraction=0.04, pad=0.03)
@@ -94,18 +126,15 @@ def heatmap(out: Path) -> None:
 
 
 def f1_bars(out: Path) -> None:
-    rows = []
-    for s, sn in SIZES:
-        for c, cn in CLASSIFIERS:
-            rows.append((f"{sn} + {cn}", golden(f"embeddings-e5-{s}{c}")["f1"], EMB))
-    rows.append(("LoRA xlm-roberta-base", golden("lora-xlmr")["f1"], LORA))
-    rows.append(("каскад LoRA → судья", golden("cascade-lora-xlmr")["f1"], CASCADE))
+    rows = [(s["label"], golden(s["name"])["f1"], s["color"]) for s in stages()]
+    rows.append(("каскад LoRA xlm-roberta → судья", golden("cascade-lora-xlmr")["f1"], CASCADE))
+    rows.append(("каскад LoRA mdeberta → судья", golden("cascade-lora-mdeberta")["f1"], CASCADE))
     rows.append(("каскад e5-large → судья", golden("cascade-embeddings-e5-large")["f1"], CASCADE))
     rows.append(("каскад e5-base → судья", golden("cascade-embeddings-e5-base-mlp")["f1"], CASCADE))
     rows.append(("судья Haiku 5.5", golden("judge-haiku")["f1"], JUDGE))
     rows.append(("ключевые слова", golden("keyword")["f1"], KEYWORD))
     rows.sort(key=lambda r: r[1])
-    fig, ax = plt.subplots(figsize=(8, 6.2))
+    fig, ax = plt.subplots(figsize=(8.5, 8.4))
     style(fig, ax)
     names, vals, colors = zip(*rows)
     bars = ax.barh(names, vals, color=colors, height=0.66)
@@ -121,26 +150,25 @@ def f1_bars(out: Path) -> None:
 
 
 def points() -> list[dict]:
-    """все подходы на golden: FPR по оси X, recall по оси Y"""
+    """подборка подходов на golden: FPR по оси X, recall по оси Y (все остальные есть в quality_map_all)"""
     rows = []
-    for s, sn in SIZES:
-        for c, cn in CLASSIFIERS:
-            r = golden(f"embeddings-e5-{s}{c}")
-            rows.append({"label": f"{sn} + {cn}", "fpr": r["fpr"], "recall": r["recall"], "color": EMB, "marker": "o"})
-    lora = golden("lora-xlmr")
-    rows.append({"label": "LoRA", "fpr": lora["fpr"], "recall": lora["recall"], "color": LORA, "marker": "*", "size": 220})
+    for s in stages():
+        if "bge" in s["name"]:
+            continue
+        r = golden(s["name"])
+        rows.append({"label": s["label"], "fpr": r["fpr"], "recall": r["recall"], "color": s["color"], "marker": s["marker"], "size": s["size"]})
     for name, label in [("cascade-lora-xlmr", "каскад LoRA → судья"),
                         ("cascade-embeddings-e5-base-mlp", "каскад e5-base → судья"),
                         ("cascade-embeddings-e5-large", "каскад e5-large → судья")]:
         r = golden(name)
-        rows.append({"label": label, "fpr": r["fpr"], "recall": r["recall"], "color": CASCADE, "marker": "^"})
+        rows.append({"label": label, "fpr": r["fpr"], "recall": r["recall"], "color": CASCADE, "marker": "^", "size": 90})
     judge = golden("judge-haiku")
-    rows.append({"label": "судья Haiku 5.5", "fpr": judge["fpr"], "recall": judge["recall"], "color": JUDGE, "marker": "P"})
+    rows.append({"label": "судья Haiku 5.5", "fpr": judge["fpr"], "recall": judge["recall"], "color": JUDGE, "marker": "P", "size": 90})
     kw = golden("keyword")
-    rows.append({"label": "ключевые слова", "fpr": kw["fpr"], "recall": kw["recall"], "color": KEYWORD, "marker": "x", "filled": False})
+    rows.append({"label": "ключевые слова", "fpr": kw["fpr"], "recall": kw["recall"], "color": KEYWORD, "marker": "x", "size": 90, "filled": False})
     for run in ("run1", "run2"):
         pt = golden(f"prompt-tuning-xlmr/{run}")
-        rows.append({"label": f"prompt tuning, {run[-1]}", "fpr": pt["fpr"], "recall": pt["recall"], "color": PROMPT, "marker": "X"})
+        rows.append({"label": f"prompt tuning, {run[-1]}", "fpr": pt["fpr"], "recall": pt["recall"], "color": PROMPT, "marker": "X", "size": 90})
     return rows
 
 
@@ -148,12 +176,11 @@ def quality_map(out: Path) -> None:
     fig, ax = plt.subplots(figsize=(9, 6.2))
     style(fig, ax)
     for p in points():
-        size = p.get("size", 90)
         if p.get("filled", True):
-            ax.scatter(p["fpr"], p["recall"], s=size, color=p["color"], marker=p["marker"],
-                       edgecolor=SURFACE, linewidth=0.8, zorder=3)
+            ax.scatter(p["fpr"], p["recall"], s=p["size"], color=p["color"], marker=p["marker"],
+                       edgecolor=SURFACE, linewidth=0.8, zorder=4 if p["marker"] == "*" else 3)
         else:
-            ax.scatter(p["fpr"], p["recall"], s=size, color=p["color"], marker=p["marker"], linewidth=1.5, zorder=3)
+            ax.scatter(p["fpr"], p["recall"], s=p["size"], color=p["color"], marker=p["marker"], linewidth=1.5, zorder=3)
         dx, dy, ha = OFFSET[p["label"]]
         ax.annotate(p["label"], (p["fpr"], p["recall"]), xytext=(dx, dy), textcoords="offset points",
                     ha=ha, va="center", fontsize=8.5, color=INK)
@@ -162,10 +189,11 @@ def quality_map(out: Path) -> None:
     ax.set_xlabel("доля ложных срабатываний (FPR), левее лучше", color=INK_2)
     ax.set_ylabel("полнота (recall), выше лучше", color=INK_2)
     ax.grid(True, color=GRID, linewidth=0.8, zorder=0)
-    ax.set_title("Качество на golden: какие атаки ловим и сколько безопасных задеваем", loc="left", color=INK, fontsize=12)
     handles = [
         Line2D([], [], marker="o", color=EMB, linestyle="", label="эмбеддинги + классификатор"),
-        Line2D([], [], marker="*", color=LORA, linestyle="", markersize=12, label="LoRA"),
+        Line2D([], [], marker="s", color=TFIDF, linestyle="", label="TF-IDF + логрегрессия"),
+        Line2D([], [], marker="*", color=LORA, linestyle="", markersize=12, label="LoRA xlm-roberta"),
+        Line2D([], [], marker="*", color=LORA2, linestyle="", markersize=12, label="LoRA mdeberta"),
         Line2D([], [], marker="^", color=CASCADE, linestyle="", label="каскады"),
         Line2D([], [], marker="P", color=JUDGE, linestyle="", label="судья Haiku 5.5"),
         Line2D([], [], marker="X", color=PROMPT, linestyle="", label="prompt tuning (три запуска, не обучился)"),
@@ -177,25 +205,26 @@ def quality_map(out: Path) -> None:
 
 def benign_fpr(out: Path) -> None:
     """доля ложных срабатываний на обычных и пограничных безопасных письмах golden"""
-    detectors = [("embeddings-e5-base-mlp", "e5-base + MLP", EMB), ("lora-xlmr", "LoRA", LORA),
+    detectors = [("tfidf-logreg", "TF-IDF", TFIDF), ("embeddings-e5-base-mlp", "e5-base + MLP", EMB),
+                 ("lora-xlmr", "LoRA xlm-roberta", LORA), ("lora-mdeberta", "LoRA mdeberta", LORA2),
                  ("cascade-lora-xlmr", "каскад LoRA → судья", CASCADE)]
     groups = [("category=benign", "обычные безопасные"), ("category=benign_borderline", "пограничные безопасные")]
-    fig, ax = plt.subplots(figsize=(8, 5))
+    fig, ax = plt.subplots(figsize=(9.5, 5))
     style(fig, ax)
-    width, x = 0.26, np.arange(len(groups))
+    width, x = 0.16, np.arange(len(groups))
     for i, (name, label, color) in enumerate(detectors):
-        slices = {r["slice"]: r for r in json.loads((RESULTS_DIR / name / "golden.json").read_text(encoding="utf-8"))["slices"]}
+        slices = {r["slice"]: r for r in meta(name)["slices"]}
         vals = [slices[key]["fpr"] for key, _ in groups]
-        bars = ax.bar(x + (i - 1) * width, vals, width, color=color, label=label)
+        bars = ax.bar(x + (i - (len(detectors) - 1) / 2) * width, vals, width, color=color, label=label)
         for b, v in zip(bars, vals):
-            ax.text(b.get_x() + b.get_width() / 2, v + 0.01, ru(v), ha="center", va="bottom", fontsize=9, color=INK)
+            ax.text(b.get_x() + b.get_width() / 2, v + 0.01, ru(v), ha="center", va="bottom", fontsize=8.5, color=INK)
     ax.set_xticks(x)
     ax.set_xticklabels([g for _, g in groups])
-    ax.set_ylim(0, 0.6)
+    ax.set_ylim(0, 1.0)
     ax.set_ylabel("доля ложных срабатываний (FPR)", color=INK_2)
     ax.grid(True, axis="y", color=GRID, linewidth=0.8, zorder=0)
     ax.set_axisbelow(True)
-    ax.legend(frameon=False, fontsize=9, labelcolor=INK_2)
+    ax.legend(frameon=False, fontsize=9, labelcolor=INK_2, loc="upper left")
     ax.set_title("Безопасные письма: где детекторы ошибаются", loc="left", color=INK, fontsize=12)
     save(fig, out)
 
@@ -205,19 +234,25 @@ def cost_f1(out: Path) -> None:
     items = [("судья Haiku 5.5", "judge-haiku", JUDGE, "P"),
              ("каскад e5-base → судья", "cascade-embeddings-e5-base-mlp", CASCADE, "^"),
              ("каскад e5-large → судья", "cascade-embeddings-e5-large", CASCADE, "^"),
-             ("каскад LoRA → судья", "cascade-lora-xlmr", CASCADE, "^"),
-             ("LoRA", "lora-xlmr", LORA, "*"),
-             ("e5-large + MLP", "embeddings-e5-large-mlp", EMB, "o")]
+             ("каскад LoRA xlm-roberta → судья", "cascade-lora-xlmr", CASCADE, "^"),
+             ("каскад LoRA mdeberta → судья", "cascade-lora-mdeberta", CASCADE, "^"),
+             ("LoRA xlm-roberta", "lora-xlmr", LORA, "*"),
+             ("LoRA mdeberta", "lora-mdeberta", LORA2, "*"),
+             ("e5-large + MLP", "embeddings-e5-large-mlp", EMB, "o"),
+             ("TF-IDF + логрегрессия", "tfidf-logreg", TFIDF, "s")]
+    offsets = {"каскад e5-large → судья": (0, 10, "center"), "каскад e5-base → судья": (0, -12, "center"),
+               "каскад LoRA mdeberta → судья": (0, 20, "center"), "каскад LoRA xlm-roberta → судья": (10, -2, "left"),
+               "LoRA mdeberta": (10, 3, "left"), "LoRA xlm-roberta": (10, -4, "left")}
     free_x = 0.001
-    fig, ax = plt.subplots(figsize=(8.5, 5.4))
+    fig, ax = plt.subplots(figsize=(9, 5.6))
     style(fig, ax)
     for label, name, color, marker in items:
-        data = json.loads((RESULTS_DIR / name / "golden.json").read_text(encoding="utf-8"))
+        data = meta(name)
         cost = data["cost_per_1000_usd"] or 0.0
         x = cost if cost > 0 else free_x
         f1 = golden(name)["f1"]
         ax.scatter(x, f1, s=220 if marker == "*" else 90, color=color, marker=marker, edgecolor=SURFACE, linewidth=0.8, zorder=3)
-        dx, dy, ha = {"каскад e5-large → судья": (0, 10, "center"), "каскад e5-base → судья": (0, -12, "center")}.get(label, (10, 0, "left"))
+        dx, dy, ha = offsets.get(label, (10, 0, "left"))
         ax.annotate(label, (x, f1), xytext=(dx, dy), textcoords="offset points", ha=ha, va="center", fontsize=8.5, color=INK)
     ax.set_xscale("log")
     ax.set_xlim(free_x / 2, 1.0)
@@ -242,9 +277,11 @@ PR_OFFSET = {
     "e5-base + kNN": (-8, -4, "right"),
     "e5-large + логрегрессия": (-8, 0, "right"),
     "e5-large + MLP": (-8, -8, "right"),
-    "e5-large + kNN": (8, -4, "left"),
-    "LoRA": (10, 4, "left"),
-    "каскад LoRA → судья": (-10, 6, "right"),
+    "e5-large + kNN": (-8, -9, "right"),
+    "TF-IDF + логрегрессия": (0, 11, "center"),
+    "LoRA xlm-roberta": (10, -8, "left"),
+    "LoRA mdeberta": (10, 8, "left"),
+    "каскад LoRA → судья": (-10, 8, "right"),
     "каскад e5-base → судья": (8, 0, "left"),
     "каскад e5-large → судья": (-8, 10, "right"),
     "судья Haiku 5.5": (-8, -4, "right"),
@@ -253,16 +290,15 @@ PR_OFFSET = {
 
 
 def pr_map(out: Path) -> None:
-    """precision против recall на golden: PR-кривая для всех подходов без prompt tuning"""
+    """precision против recall на golden: PR-кривая для подборки подходов без prompt tuning"""
     fig, ax = plt.subplots(figsize=(9, 6.2))
     style(fig, ax)
     rows = []
-    for s, sn in SIZES:
-        for c, cn in CLASSIFIERS:
-            g = golden(f"embeddings-e5-{s}{c}")
-            rows.append((f"{sn} + {cn}", g["recall"], g["precision"], EMB, "o", 90))
-    lora = golden("lora-xlmr")
-    rows.append(("LoRA", lora["recall"], lora["precision"], LORA, "*", 220))
+    for s in stages():
+        if "bge" in s["name"]:
+            continue
+        g = golden(s["name"])
+        rows.append((s["label"], g["recall"], g["precision"], s["color"], s["marker"], s["size"]))
     for name, label in [("cascade-lora-xlmr", "каскад LoRA → судья"),
                         ("cascade-embeddings-e5-base-mlp", "каскад e5-base → судья"),
                         ("cascade-embeddings-e5-large", "каскад e5-large → судья")]:
@@ -276,7 +312,7 @@ def pr_map(out: Path) -> None:
     ax.text(1.0, 0.5, " случайный выбор (баланс 1:1)", va="bottom", ha="right", fontsize=8.5, color=INK_2)
     for label, rec, prec, color, marker, size in rows:
         ax.scatter(rec, prec, s=size, color=color, marker=marker, edgecolor=SURFACE if marker != "x" else None,
-                   linewidth=0.8 if marker != "x" else 1.5, zorder=3)
+                   linewidth=0.8 if marker != "x" else 1.5, zorder=4 if marker == "*" else 3)
         dx, dy, ha = PR_OFFSET[label]
         ax.annotate(label, (rec, prec), xytext=(dx, dy), textcoords="offset points", ha=ha, va="center",
                     fontsize=8.5, color=INK)
@@ -320,13 +356,12 @@ def place_labels(fig, ax, pts, fontsize=8) -> None:
 
 
 def _all_points() -> list[dict]:
-    """все одноступенчатые детекторы и все каскады на golden"""
+    """все одноступенчатые детекторы и их каскады на golden"""
     rows = []
-    stages = [(f"{sn} + {cn}", f"embeddings-e5-{s}{c}") for s, sn in SIZES for c, cn in CLASSIFIERS] + [("LoRA", "lora-xlmr")]
-    for label, fs in stages:
-        g, cg = golden(fs), golden("cascade-" + fs)
-        cdata = json.loads((RESULTS_DIR / ("cascade-" + fs) / "golden.json").read_text(encoding="utf-8"))
-        rows.append({"label": label, "name": fs, "g": g, "c": cg, "cost": cdata["cost_per_1000_usd"] or 0.0})
+    for s in stages():
+        cdata = meta("cascade-" + s["name"])
+        rows.append({**s, "g": golden(s["name"]), "c": golden("cascade-" + s["name"]), "cost": cdata["cost_per_1000_usd"] or 0.0,
+                     "share": cdata["judged_share"]})
     return rows
 
 
@@ -338,7 +373,7 @@ def _numbered(pairs: list[dict]) -> list[dict]:
     return out
 
 
-def _key(fig, pairs, x=0.735, y0=0.86, step=0.036) -> None:
+def _key(fig, pairs, x=0.735, y0=0.86, step=0.034) -> None:
     """ключ номеров справа от графика: номера выровнены по правому краю"""
     fig.text(x, y0 + 0.045, "Номер: подход", fontsize=11, color=INK, weight="bold")
     for k, r in enumerate(pairs):
@@ -346,29 +381,29 @@ def _key(fig, pairs, x=0.735, y0=0.86, step=0.036) -> None:
         fig.text(x + 0.024, y0 - k * step, r["label"], fontsize=10, color=INK)
 
 
-def _marks(ax, x_single, y_single, x_casc, y_casc, lora):
-    ax.scatter(x_single, y_single, s=200 if lora else 70, color=LORA if lora else EMB, marker="*" if lora else "o", edgecolor=SURFACE, linewidth=0.8, zorder=3)
+def _marks(ax, x_single, y_single, x_casc, y_casc, r):
+    ax.scatter(x_single, y_single, s=r["size"], color=r["color"], marker=r["marker"], edgecolor=SURFACE, linewidth=0.8, zorder=4 if r["marker"] == "*" else 3)
     ax.scatter(x_casc, y_casc, s=80, color=CASCADE, marker="^", edgecolor=SURFACE, linewidth=0.8, zorder=3)
 
 
 def quality_map_all(out: Path) -> None:
     """карта качества: все одноступенчатые детекторы и все каскады, номера пар и ключ справа"""
-    fig, ax = plt.subplots(figsize=(13, 7.4))
+    fig, ax = plt.subplots(figsize=(13, 8.4))
     style(fig, ax)
     fig.subplots_adjust(left=0.07, right=0.70)
     pairs = _numbered(_all_points())
     pts = []
     for r in pairs:
         g, c = r["g"], r["c"]
-        _marks(ax, g["fpr"], g["recall"], c["fpr"], c["recall"], r["label"] == "LoRA")
+        _marks(ax, g["fpr"], g["recall"], c["fpr"], c["recall"], r)
         pts.append({"x": g["fpr"], "y": g["recall"], "text": str(r["n"])})
         pts.append({"x": c["fpr"], "y": c["recall"], "text": str(r["n"])})
+    manual = {"judge-haiku": (4, 14, "left", "bottom"), "prompt-tuning-xlmr/run1": (-10, 0, "right", "center"),
+              "prompt-tuning-xlmr/run2": (-8, 12, "right", "bottom")}
     for label, name, color, marker in [("судья Haiku 5.5", "judge-haiku", JUDGE, "P"), ("ключевые слова", "keyword", KEYWORD, "x"),
                                        ("prompt tuning, 1", "prompt-tuning-xlmr/run1", PROMPT, "X"), ("prompt tuning, 2", "prompt-tuning-xlmr/run2", PROMPT, "X")]:
         g = golden(name)
         ax.scatter(g["fpr"], g["recall"], s=90, color=color, marker=marker, zorder=3, **({} if marker == "x" else {"edgecolor": SURFACE, "linewidth": 0.8}))
-        manual = {"judge-haiku": (4, 14, "left", "bottom"), "prompt-tuning-xlmr/run1": (-10, 0, "right", "center"),
-                  "prompt-tuning-xlmr/run2": (-8, 12, "right", "bottom")}
         if name in manual:
             dx, dy, ha, va = manual[name]
             ax.annotate(label, (g["fpr"], g["recall"]), xytext=(dx, dy), textcoords="offset points", ha=ha, va=va, fontsize=9, color=INK)
@@ -379,10 +414,7 @@ def quality_map_all(out: Path) -> None:
     ax.set_xlabel("доля ложных срабатываний (FPR), левее лучше", color=INK_2)
     ax.set_ylabel("полнота (recall), выше лучше", color=INK_2)
     ax.grid(True, color=GRID, linewidth=0.8, zorder=0)
-    ax.set_title("Качество на golden: какие атаки ловим и сколько безопасных задеваем", loc="left", color=INK, fontsize=12)
-    handles = [
-        Line2D([], [], marker="o", color=EMB, linestyle="", label="первая ступень без судьи"),
-        Line2D([], [], marker="*", color=LORA, linestyle="", markersize=12, label="LoRA без судьи"),
+    handles = family_handles() + [
         Line2D([], [], marker="^", color=CASCADE, linestyle="", label="каскад с судьёй (тот же номер, что у первой ступени)"),
         Line2D([], [], marker="P", color=JUDGE, linestyle="", label="судья Haiku 5.5"),
         Line2D([], [], marker="X", color=PROMPT, linestyle="", label="prompt tuning (три запуска, не обучился)"),
@@ -397,17 +429,17 @@ def quality_map_all(out: Path) -> None:
 def cost_f1_all(out: Path) -> None:
     """качество против цены: все первые ступени стоят 0, каскады и судья правее; номера пар и ключ справа"""
     free_x = 0.001
-    fig, ax = plt.subplots(figsize=(13, 7.4))
+    fig, ax = plt.subplots(figsize=(13, 8.4))
     style(fig, ax)
     fig.subplots_adjust(left=0.07, right=0.70)
     pairs = _numbered(_all_points())
     pts = []
     for r in pairs:
         cx = r["cost"] if r["cost"] > 0 else free_x
-        _marks(ax, free_x, r["g"]["f1"], cx, r["c"]["f1"], r["label"] == "LoRA")
+        _marks(ax, free_x, r["g"]["f1"], cx, r["c"]["f1"], r)
         pts.append({"x": free_x, "y": r["g"]["f1"], "text": str(r["n"])})
         pts.append({"x": cx, "y": r["c"]["f1"], "text": str(r["n"])})
-    j = json.loads((RESULTS_DIR / "judge-haiku" / "golden.json").read_text(encoding="utf-8"))
+    j = meta("judge-haiku")
     ax.scatter(j["cost_per_1000_usd"], golden("judge-haiku")["f1"], s=90, color=JUDGE, marker="P", edgecolor=SURFACE, linewidth=0.8, zorder=3)
     pts.append({"x": j["cost_per_1000_usd"], "y": golden("judge-haiku")["f1"], "text": "судья Haiku 5.5"})
     ax.set_xscale("log")
@@ -420,9 +452,7 @@ def cost_f1_all(out: Path) -> None:
     ax.set_ylabel("F1 на golden", color=INK_2)
     ax.grid(True, color=GRID, linewidth=0.8, zorder=0)
     ax.set_title("Качество и цена", loc="center", color=INK, fontsize=12)
-    handles = [
-        Line2D([], [], marker="o", color=EMB, linestyle="", label="первая ступень без судьи (0 $)"),
-        Line2D([], [], marker="*", color=LORA, linestyle="", markersize=12, label="LoRA без судьи (0 $)"),
+    handles = family_handles(singles_label="без судьи, 0 $") + [
         Line2D([], [], marker="^", color=CASCADE, linestyle="", label="каскад с судьёй (тот же номер, что у первой ступени)"),
         Line2D([], [], marker="P", color=JUDGE, linestyle="", label="судья Haiku 5.5"),
     ]
@@ -435,18 +465,16 @@ def cost_f1_all(out: Path) -> None:
 def f1_pairs(out: Path) -> None:
     """F1 каждой первой ступени без судьи и в каскаде с судьёй; справа доля запросов судье"""
     pairs = sorted(_all_points(), key=lambda r: r["c"]["f1"])  # снизу вверх: лучший каскад наверху
-    fig, ax = plt.subplots(figsize=(11, 7.4))
+    fig, ax = plt.subplots(figsize=(11, 10.6))
     style(fig, ax)
     h = 0.36
     for i, r in enumerate(pairs):
-        lora = r["label"] == "LoRA"
-        share = json.loads((RESULTS_DIR / ("cascade-" + r["name"]) / "golden.json").read_text(encoding="utf-8"))["judged_share"]
         single, casc = r["g"]["f1"], r["c"]["f1"]
-        ax.barh(i + h / 2, single, height=h, color=LORA if lora else EMB, alpha=0.55, zorder=3)
+        ax.barh(i + h / 2, single, height=h, color=r["color"], alpha=0.55, zorder=3)
         ax.barh(i - h / 2, casc, height=h, color=CASCADE, zorder=3)
         ax.text(single + 0.008, i + h / 2, ru(single), va="center", fontsize=8.5, color=INK_2)
         ax.text(casc + 0.008, i - h / 2, ru(casc), va="center", fontsize=8.5, color=INK)
-        ax.text(1.05, i, f"судье {share * 100:.1f}%".replace(".", ","), va="center", fontsize=9, color=INK_2)
+        ax.text(1.05, i, f"судье {r['share'] * 100:.1f}%".replace(".", ","), va="center", fontsize=9, color=INK_2)
     ax.axvline(1.0, color=JUDGE, linewidth=1.6, linestyle="--", zorder=2)
     ax.text(1.0, len(pairs) - 0.35, "судья один: 1,00", ha="center", va="bottom", fontsize=9, color=JUDGE)
     ax.set_yticks(range(len(pairs)))
@@ -459,10 +487,10 @@ def f1_pairs(out: Path) -> None:
     ax.grid(True, axis="x", color=GRID, linewidth=0.8, zorder=0)
     ax.set_axisbelow(True)
     ax.set_title("F1: первая ступень и каскад с судьёй", loc="center", color=INK, fontsize=12)
-    handles = [Patch(color=EMB, alpha=0.55, label="первая ступень без судьи"),
-               Patch(color=LORA, alpha=0.55, label="LoRA без судьи"),
-               Patch(color=CASCADE, label="каскад с судьёй")]
-    ax.legend(handles=handles, loc="upper center", frameon=False, fontsize=9, labelcolor=INK_2, bbox_to_anchor=(0.5, -0.1), ncol=3)
+    handles = [Patch(color=EMB, alpha=0.55, label="e5 без судьи"), Patch(color=BGE, alpha=0.55, label="bge-m3 без судьи"),
+               Patch(color=TFIDF, alpha=0.55, label="TF-IDF без судьи"), Patch(color=LORA, alpha=0.55, label="LoRA xlm-roberta без судьи"),
+               Patch(color=LORA2, alpha=0.55, label="LoRA mdeberta без судьи"), Patch(color=CASCADE, label="каскад с судьёй")]
+    ax.legend(handles=handles, loc="upper center", frameon=False, fontsize=9, labelcolor=INK_2, bbox_to_anchor=(0.5, -0.07), ncol=3)
     save(fig, out)
 
 
@@ -476,7 +504,7 @@ def main() -> None:
     quality_map_all(OUT_DIR / "quality_map_all")
     cost_f1_all(OUT_DIR / "cost_f1_all")
     f1_pairs(OUT_DIR / "f1_pairs")
-    print(f"графики в {OUT_DIR}: heatmap_e5, quality_map, f1_bars, benign_fpr, cost_f1 (png и svg)")
+    print(f"графики в {OUT_DIR}: heatmap_e5, quality_map, pr_map, f1_bars, benign_fpr, cost_f1, quality_map_all, cost_f1_all, f1_pairs (png и svg)")
 
 
 if __name__ == "__main__":

@@ -18,14 +18,20 @@ from detectors.implementations.embeddings import KINDS, EmbeddingDetector, detec
 from detectors.implementations.judge import JudgeDetector
 from detectors.llm_cache import CachedLLM
 from detectors.implementations.keyword import KeywordDetector
-from detectors.implementations.lora import BASE_MODEL, LoraDetector
+from detectors.implementations.lora import LoraDetector
+from detectors.implementations.lora_mdeberta import LoraMdebertaDetector
+from detectors.implementations.tfidf import RESULTS_DIR as TFIDF_DIR, TfidfDetector
 
 RESULTS_DIR = Path("results")
-E5_MODELS = ("intfloat/multilingual-e5-small", "intfloat/multilingual-e5-base", "intfloat/multilingual-e5-large")
-CASCADE_FIRST_STAGES = ("embeddings-e5-base-mlp", "embeddings-e5-large", "lora-xlmr")
+EMBEDDING_MODELS = ("intfloat/multilingual-e5-small", "intfloat/multilingual-e5-base", "intfloat/multilingual-e5-large",
+                    "BAAI/bge-m3")
+LORA_DETECTORS = (LoraDetector, LoraMdebertaDetector)
+CASCADE_FIRST_STAGES = tuple(detector_name(m, k) for m in EMBEDDING_MODELS for k in KINDS) + (
+    "tfidf-logreg", "lora-xlmr", "lora-mdeberta")
 # порядок предпочтения детектора по умолчанию: лучший из готовых
-DEFAULT_ORDER = ("cascade-lora-xlmr", "cascade-embeddings-e5-large", "cascade-embeddings-e5-base-mlp",
-                 "lora-xlmr", "embeddings-e5-base-mlp", "embeddings-e5-large", "keyword")
+DEFAULT_ORDER = ("cascade-lora-mdeberta", "cascade-lora-xlmr", "cascade-embeddings-e5-large",
+                 "cascade-embeddings-e5-base-mlp", "lora-mdeberta", "lora-xlmr", "embeddings-e5-base-mlp",
+                 "embeddings-e5-large", "tfidf-logreg", "keyword")
 
 
 class MemoEncoder(Encoder):
@@ -56,11 +62,15 @@ def _embedding_problem(model: str, kind: str) -> str | None:
     return None if model_cached(model) else f"нет модели {model} в кэше"
 
 
-def _lora_problem() -> str | None:
-    adapter = LoraDetector.results_dir / "adapter"
+def _lora_problem(cls: type[LoraDetector]) -> str | None:
+    adapter = cls.results_dir / "adapter"
     if not (adapter / "adapter_config.json").exists() or not (adapter / "adapter_model.safetensors").exists():
         return "нет адаптера"
-    return None if model_cached(BASE_MODEL) else f"нет базы {BASE_MODEL} в кэше"
+    return None if model_cached(cls.base_model) else f"нет базы {cls.base_model} в кэше"
+
+
+def _tfidf_problem() -> str | None:
+    return None if (TFIDF_DIR / "classifier.joblib").exists() else "нет обученного классификатора"
 
 
 def _judge_problem() -> str | None:
@@ -77,9 +87,14 @@ def _judge() -> JudgeDetector:
 
 class Registry:
     def __init__(self):
-        self._problems: dict[str, callable] = {"keyword": lambda: None, "judge-haiku": _judge_problem, "lora-xlmr": _lora_problem}
-        self._factories: dict[str, callable] = {"keyword": KeywordDetector, "judge-haiku": _judge, "lora-xlmr": LoraDetector}
-        for model in E5_MODELS:
+        self._problems: dict[str, callable] = {"keyword": lambda: None, "judge-haiku": _judge_problem,
+                                               "tfidf-logreg": _tfidf_problem}
+        self._factories: dict[str, callable] = {"keyword": KeywordDetector, "judge-haiku": _judge,
+                                                "tfidf-logreg": TfidfDetector}
+        for cls in LORA_DETECTORS:
+            self._problems[cls.name] = partial(_lora_problem, cls)
+            self._factories[cls.name] = cls
+        for model in EMBEDDING_MODELS:
             for kind in KINDS:
                 name = detector_name(model, kind)
                 self._problems[name] = partial(_embedding_problem, model, kind)

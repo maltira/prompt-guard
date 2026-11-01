@@ -72,7 +72,9 @@ class LoraDetector(Detector):
         from peft import PeftModel
         from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-        self._tok = AutoTokenizer.from_pretrained(self.base_model)  # токенизатор у базы и адаптера один
+        # токенизатор у базы и адаптера один; готовый tokenizer.json из Colab читается без конвертации (у mdeberta её нет)
+        has_json = (self.adapter_dir / "tokenizer.json").exists()
+        self._tok = AutoTokenizer.from_pretrained(self.adapter_dir if has_json else self.base_model)
         try:
             # модель уже в кэше: грузим без обращения к сети
             base = AutoModelForSequenceClassification.from_pretrained(self.base_model, num_labels=2, local_files_only=True)

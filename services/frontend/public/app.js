@@ -55,15 +55,17 @@
   const FIXED_LABELS = {
     keyword: "Ключевые слова",
     "judge-haiku": "Судья Haiku 5.5",
-    "lora-xlmr": "LoRA (xlm-roberta)",
+    "lora-xlmr": "LoRA (xlm-roberta-base)",
+    "lora-mdeberta": "LoRA (mdeberta-v3-base)",
+    "tfidf-logreg": "TF-IDF + логрегрессия",
     "prompt-tuning-xlmr": "Prompt tuning (xlm-roberta)",
   };
 
   function labelOf(name) {
     if (FIXED_LABELS[name]) return FIXED_LABELS[name];
     if (name.startsWith("cascade-")) return "Каскад «" + labelOf(name.slice("cascade-".length)) + " → судья»";
-    const m = /^embeddings-e5-(small|base|large)(?:-(knn|mlp))?$/.exec(name);
-    if (m) return `e5-${m[1]} + ${m[2] === "knn" ? "kNN" : m[2] === "mlp" ? "MLP" : "логрегрессия"}`;
+    const m = /^embeddings-(e5-small|e5-base|e5-large|bge-m3)(?:-(knn|mlp))?$/.exec(name);
+    if (m) return `${m[1]} + ${m[2] === "knn" ? "kNN" : m[2] === "mlp" ? "MLP" : "логрегрессия"}`;
     return name;
   }
 
