@@ -38,6 +38,3 @@ results/prompt-tuning-xlmr/**/tokenizer_config.json
 
 # журнал решений шлюза
 results/gateway/
-
-docs/*.docx
-docs/SPEECH.md
